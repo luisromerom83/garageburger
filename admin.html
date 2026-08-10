@@ -59,12 +59,6 @@
       margin-bottom: 8px;
       font-weight: 600;
     }
-    .form-hint {
-      font-size: 0.75rem;
-      color: var(--primary-yellow);
-      margin-top: 4px;
-      display: block;
-    }
     .form-control {
       width: 100%;
       background: var(--bg-dark);
@@ -143,27 +137,81 @@
     }
 
     .image-preview-thumbnail {
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       border-radius: 6px;
       object-fit: cover;
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--primary-orange);
       background: #000;
     }
 
-    .path-helper-box {
-      background: rgba(255, 183, 3, 0.08);
-      border: 1px dashed var(--primary-yellow);
-      padding: 14px 18px;
-      border-radius: var(--radius-md);
-      margin-bottom: 20px;
-      font-size: 0.88rem;
+    /* Modal Image Picker / Explorer */
+    .image-picker-modal {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(6px);
+      z-index: 3000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-    .path-helper-box code {
-      background: rgba(0,0,0,0.4);
-      padding: 2px 6px;
-      border-radius: 4px;
-      color: var(--primary-yellow);
+    .image-picker-modal.active {
+      display: flex;
+    }
+    .picker-box {
+      background: var(--bg-card);
+      border: 1px solid var(--primary-orange);
+      border-radius: var(--radius-lg);
+      max-width: 700px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+    }
+    .picker-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .picker-body {
+      padding: 20px;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 16px;
+    }
+    .asset-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      text-align: center;
+    }
+    .asset-card:hover {
+      border-color: var(--primary-yellow);
+      transform: translateY(-3px);
+    }
+    .asset-card img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+    }
+    .asset-card span {
+      display: block;
+      font-size: 0.7rem;
+      padding: 6px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   </style>
 </head>
@@ -203,21 +251,12 @@
     <!-- Quick Actions Banner -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
       <div>
-        <h1 style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--primary-yellow);">GESTOR CMS & STORAGE</h1>
-        <p style="color: var(--text-muted);">Administra la presentación, carrusel de anuncios, categorías y favoritos en tiempo real.</p>
+        <h1 style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--primary-yellow);">GESTOR CMS & EXPLORADOR DE IMÁGENES</h1>
+        <p style="color: var(--text-muted);">Selecciona imágenes directamente del explorador de la carpeta <code>assets/</code>.</p>
       </div>
       <div style="display: flex; gap: 12px;">
         <button id="save-all-vercel-btn" class="btn btn-primary btn-lg"><i class="fa-solid fa-cloud-arrow-up"></i> Guardar Cambios en Vivo</button>
       </div>
-    </div>
-
-    <!-- Image Path Guide Banner -->
-    <div class="path-helper-box">
-      <strong><i class="fa-solid fa-circle-info text-yellow"></i> Guía de formato para Imágenes y Rutas:</strong>
-      <ul style="margin-left: 20px; margin-top: 6px; color: var(--text-muted);">
-        <li><strong>Imágenes Locales:</strong> Usa rutas relativas simples como <code>assets/CervezadeBarril.png</code> o <code>assets/logo.png</code> (Asegúrate de respetar mayúsculas/minúsculas).</li>
-        <li><strong>Imágenes de Internet:</strong> Puedes usar cualquier enlace directo como <code>https://images.unsplash.com/...</code></li>
-      </ul>
     </div>
 
     <!-- Section 1: Hero / Presentation Editor -->
@@ -232,9 +271,11 @@
           <input type="text" id="hero-title-input" class="form-control" placeholder="HAMBURGUESAS JUGOSAS & CERVEZA DE BARRIL">
         </div>
         <div class="form-group">
-          <label>Ruta de Imagen Principal (Costado Derecho):</label>
-          <input type="text" id="hero-image-input" class="form-control" placeholder="assets/Screenshot_20260810_105331.png">
-          <span class="form-hint">Ejemplo: assets/Screenshot_20260810_105331.png</span>
+          <label>Imagen Principal (Costado Derecho):</label>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="hero-image-input" class="form-control" placeholder="assets/Screenshot_20260810_105331.png">
+            <button class="btn btn-sm btn-outline open-explorer-btn" data-target="hero-image-input"><i class="fa-regular fa-folder-open"></i> Explorar</button>
+          </div>
         </div>
       </div>
 
@@ -319,7 +360,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <div>
           <h3 style="font-family: var(--font-heading); font-size: 1.6rem; color: #fff;">
-            <i class="fa-solid fa-burger text-yellow"></i> 4. Catálogo de Productos (Con Vista Previa e Imagen URL)
+            <i class="fa-solid fa-burger text-yellow"></i> 4. Catálogo de Productos (Con Explorador e Imágenes Seleccionables)
           </h3>
           <p style="color: var(--text-muted); font-size: 0.85rem;">
             Haz clic en la estrellita ⭐ para indicar cuáles platillos aparecen en "Los Favoritos del Garage".
@@ -334,7 +375,7 @@
             <tr>
               <th>Favorito</th>
               <th>Vista Previa</th>
-              <th>Ruta de Imagen</th>
+              <th>Seleccionar Imagen</th>
               <th>Nombre</th>
               <th>Categoría</th>
               <th>Precio ($ MXN)</th>
@@ -350,6 +391,19 @@
     </div>
 
   </main>
+
+  <!-- Image Explorer Modal -->
+  <div id="image-picker-modal" class="image-picker-modal">
+    <div class="picker-box">
+      <div class="picker-header">
+        <h3><i class="fa-regular fa-folder-open text-orange"></i> Explorador de Imágenes (Carpeta <code>assets/</code>)</h3>
+        <button id="close-picker-btn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="picker-body" id="picker-gallery">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </div>
 
   <script src="admin.js"></script>
 </body>

@@ -1,7 +1,9 @@
-// Admin Dashboard CMS Logic for GarageBurger
+// Admin Dashboard CMS Logic for GarageBurger with Asset Explorer
 
 let adminMenu = [];
 let adminConfig = {};
+let availableAssets = [];
+let activePickerCallback = null;
 
 // Popular FontAwesome Icons List for Tag Selection
 const POPULAR_ICONS = [
@@ -48,6 +50,11 @@ const addCategoryBtn = document.getElementById('add-category-btn');
 // Product Table Inputs
 const adminMenuRows = document.getElementById('admin-menu-rows');
 const addItemBtn = document.getElementById('add-item-btn');
+
+// Image Picker Modal Elements
+const imagePickerModal = document.getElementById('image-picker-modal');
+const closePickerBtn = document.getElementById('close-picker-btn');
+const pickerGallery = document.getElementById('picker-gallery');
 
 document.addEventListener('DOMContentLoaded', () => {
   checkAuthStatus();
@@ -133,6 +140,18 @@ function setupAdminListeners() {
     adminMenu.push(newItem);
     renderAdminTable();
   });
+
+  // Hero Explorer Button
+  document.querySelectorAll('.open-explorer-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const targetId = e.currentTarget.getAttribute('data-target');
+      openImagePicker((selectedPath) => {
+        document.getElementById(targetId).value = selectedPath;
+      });
+    });
+  });
+
+  closePickerBtn.addEventListener('click', closeImagePicker);
 }
 
 async function loadAdminData() {
@@ -143,6 +162,7 @@ async function loadAdminData() {
       if (dataApi.config && dataApi.menu) {
         adminConfig = dataApi.config;
         adminMenu = dataApi.menu;
+        availableAssets = dataApi.availableAssets || [];
         populateAllFields();
         return;
       }
@@ -185,6 +205,44 @@ function populateAllFields() {
   renderAdminTable();
 }
 
+// Image Explorer Modal Methods
+function openImagePicker(onSelectCallback) {
+  activePickerCallback = onSelectCallback;
+  imagePickerModal.classList.add('active');
+
+  if (availableAssets.length === 0) {
+    availableAssets = [
+      { filename: 'Boneless.png', path: 'assets/Boneless.png' },
+      { filename: 'CervezadeBarril.png', path: 'assets/CervezadeBarril.png' },
+      { filename: 'pulledpork.png', path: 'assets/pulledpork.png' },
+      { filename: 'logo.png', path: 'assets/logo.png' },
+      { filename: 'Screenshot_20260810_105000.png', path: 'assets/Screenshot_20260810_105000.png' },
+      { filename: 'Screenshot_20260810_105331.png', path: 'assets/Screenshot_20260810_105331.png' },
+      { filename: 'Screenshot_20260810_105350.png', path: 'assets/Screenshot_20260810_105350.png' },
+      { filename: 'menu.jpg', path: 'assets/menu.jpg' }
+    ];
+  }
+
+  pickerGallery.innerHTML = availableAssets.map(asset => `
+    <div class="asset-card" onclick="selectAsset('${asset.path}')">
+      <img src="${asset.path}" alt="${asset.filename}" onerror="this.src='assets/ilovegarage.png'">
+      <span>${asset.filename}</span>
+    </div>
+  `).join('');
+}
+
+window.selectAsset = function(path) {
+  if (activePickerCallback) {
+    activePickerCallback(path);
+  }
+  closeImagePicker();
+};
+
+function closeImagePicker() {
+  imagePickerModal.classList.remove('active');
+  activePickerCallback = null;
+}
+
 function renderHeroFeatures() {
   const features = (adminConfig.hero && adminConfig.hero.features) || [];
   heroFeaturesEditor.innerHTML = features.map((f, i) => `
@@ -215,9 +273,12 @@ function renderAnnouncementsEditor() {
     <div style="background: var(--bg-dark); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 16px;">
       <div class="grid grid-2" style="margin-bottom: 10px;">
         <input type="text" class="form-control" value="${ann.title}" placeholder="Título Anuncio" onchange="updateAnnouncement(${i}, 'title', this.value)">
-        <div>
-          <input type="text" class="form-control" value="${ann.image}" placeholder="Ruta Imagen (Ej: assets/CervezadeBarril.png)" onchange="updateAnnouncement(${i}, 'image', this.value); renderAnnouncementsEditor();">
-          <span class="form-hint">Ej: assets/CervezadeBarril.png</span>
+        <div style="display: flex; gap: 8px;">
+          <select class="form-control" onchange="updateAnnouncement(${i}, 'image', this.value); renderAnnouncementsEditor();">
+            <option value="${ann.image}">Actual: ${ann.image}</option>
+            ${availableAssets.map(a => `<option value="${a.path}">${a.filename}</option>`).join('')}
+          </select>
+          <button class="btn btn-sm btn-outline" onclick="openPickerForAnnouncement(${i})"><i class="fa-regular fa-folder-open"></i></button>
         </div>
       </div>
       <div style="display: flex; gap: 12px; align-items: center;">
@@ -228,6 +289,13 @@ function renderAnnouncementsEditor() {
     </div>
   `).join('');
 }
+
+window.openPickerForAnnouncement = function(index) {
+  openImagePicker((selectedPath) => {
+    adminConfig.announcements[index].image = selectedPath;
+    renderAnnouncementsEditor();
+  });
+};
 
 window.updateAnnouncement = function(index, key, val) {
   adminConfig.announcements[index][key] = val;
@@ -274,7 +342,13 @@ function renderAdminTable() {
         <img src="${item.image}" class="image-preview-thumbnail" onerror="this.src='assets/ilovegarage.png'">
       </td>
       <td>
-        <input type="text" class="form-control" style="width: 180px;" value="${item.image}" placeholder="assets/nombre.png" onchange="updateItem(${index}, 'image', this.value); renderAdminTable();">
+        <div style="display: flex; gap: 6px; min-width: 220px;">
+          <select class="form-control" style="font-size: 0.85rem;" onchange="updateItem(${index}, 'image', this.value); renderAdminTable();">
+            <option value="${item.image}">${item.image.replace('assets/', '')}</option>
+            ${availableAssets.map(a => `<option value="${a.path}">${a.filename}</option>`).join('')}
+          </select>
+          <button class="btn btn-sm btn-outline" onclick="openPickerForProduct(${index})"><i class="fa-regular fa-folder-open"></i></button>
+        </div>
       </td>
       <td>
         <input type="text" class="form-control" value="${item.name}" onchange="updateItem(${index}, 'name', this.value)">
@@ -298,6 +372,13 @@ function renderAdminTable() {
     </tr>
   `).join('');
 }
+
+window.openPickerForProduct = function(index) {
+  openImagePicker((selectedPath) => {
+    adminMenu[index].image = selectedPath;
+    renderAdminTable();
+  });
+};
 
 window.updateItem = function(index, field, value) {
   adminMenu[index][field] = value;

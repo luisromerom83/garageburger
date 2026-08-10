@@ -5,7 +5,7 @@ const postgres = require('postgres');
 const { kv } = require('@vercel/kv');
 const { get: getEdgeConfig } = require('@vercel/edge-config');
 
-// 1. Supabase Environment Detection (Direct or via Vercel Integration)
+// 1. Supabase Environment Detection
 const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.POSTGRES_URL_NON_POOLING;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -14,13 +14,37 @@ if (supabaseUrl && supabaseKey && supabaseUrl.includes('supabase')) {
   supabase = createClient(supabaseUrl, supabaseKey);
 }
 
-// 2. Vercel Postgres Pool (POSTGRES_URL)
+// 2. Vercel Postgres Pool
 let sql = null;
 if (process.env.POSTGRES_URL) {
   try {
     sql = postgres(process.env.POSTGRES_URL, { ssl: 'require' });
   } catch (e) {
     console.warn('Vercel Postgres connection warning:', e.message);
+  }
+}
+
+// Helper: List available images in /assets folder
+function getAvailableAssets() {
+  try {
+    const assetsDir = path.join(__dirname, '..', 'assets');
+    const files = fs.readdirSync(assetsDir);
+    return files
+      .filter(file => /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file))
+      .map(file => ({
+        filename: file,
+        path: `assets/${file}`
+      }));
+  } catch (err) {
+    return [
+      { filename: 'Boneless.png', path: 'assets/Boneless.png' },
+      { filename: 'CervezadeBarril.png', path: 'assets/CervezadeBarril.png' },
+      { filename: 'pulledpork.png', path: 'assets/pulledpork.png' },
+      { filename: 'logo.png', path: 'assets/logo.png' },
+      { filename: 'Screenshot_20260810_105000.png', path: 'assets/Screenshot_20260810_105000.png' },
+      { filename: 'Screenshot_20260810_105331.png', path: 'assets/Screenshot_20260810_105331.png' },
+      { filename: 'Screenshot_20260810_105350.png', path: 'assets/Screenshot_20260810_105350.png' }
+    ];
   }
 }
 
@@ -41,7 +65,6 @@ function getFallbackStore() {
 }
 
 module.exports = async (req, res) => {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
@@ -55,14 +78,16 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // GET: Fetch live store data from Vercel KV / Edge Config / Supabase / Vercel Postgres / Fallback
+  const assetsList = getAvailableAssets();
+
+  // GET: Fetch live store data + available assets list
   if (req.method === 'GET') {
     // A. Try Vercel KV
     if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
       try {
         const kvStore = await kv.get('garage_store_data');
         if (kvStore && kvStore.config && kvStore.menu) {
-          return res.status(200).json(kvStore);
+          return res.status(200).json({ ...kvStore, availableAssets: assetsList });
         }
       } catch (err) {
         console.warn('Vercel KV get error:', err.message);
@@ -74,7 +99,7 @@ module.exports = async (req, res) => {
       try {
         const edgeStore = await getEdgeConfig('garage_store_data');
         if (edgeStore && edgeStore.config && edgeStore.menu) {
-          return res.status(200).json(edgeStore);
+          return res.status(200).json({ ...edgeStore, availableAssets: assetsList });
         }
       } catch (err) {
         console.warn('Vercel Edge Config get error:', err.message);
@@ -102,7 +127,8 @@ module.exports = async (req, res) => {
 
           return res.status(200).json({
             config: cfgData.config_data,
-            menu: formattedMenu
+            menu: formattedMenu,
+            availableAssets: assetsList
           });
         }
       } catch (err) {
@@ -110,7 +136,7 @@ module.exports = async (req, res) => {
       }
     }
 
-    // D. Try Vercel Postgres (sql)
+    // D. Try Vercel Postgres
     if (sql) {
       try {
         const cfgRows = await sql`SELECT config_data FROM garage_config WHERE id = 1`;
@@ -131,7 +157,8 @@ module.exports = async (req, res) => {
 
           return res.status(200).json({
             config: cfgRows[0].config_data,
-            menu: formattedMenu
+            menu: formattedMenu,
+            availableAssets: assetsList
           });
         }
       } catch (err) {
@@ -139,11 +166,12 @@ module.exports = async (req, res) => {
       }
     }
 
-    // E. Return Fallback JSON
-    return res.status(200).json(getFallbackStore());
+    // E. Fallback JSON
+    const fallback = getFallbackStore();
+    return res.status(200).json({ ...fallback, availableAssets: assetsList });
   }
 
-  // POST: Save live store data to all available Vercel Storage providers
+  // POST: Update live store data
   if (req.method === 'POST') {
     try {
       const { pin, config, menu } = req.body || {};
@@ -154,7 +182,6 @@ module.exports = async (req, res) => {
         return res.status(401).json({ error: 'PIN de seguridad incorrecto' });
       }
 
-      // A. Save to Vercel KV if configured
       if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
         try {
           await kv.set('garage_store_data', { config, menu });
@@ -163,7 +190,6 @@ module.exports = async (req, res) => {
         }
       }
 
-      // B. Save to Supabase if configured
       if (supabase) {
         try {
           if (config) {
@@ -192,7 +218,6 @@ module.exports = async (req, res) => {
         }
       }
 
-      // C. Save to Vercel Postgres if configured
       if (sql) {
         try {
           if (config) {
@@ -224,14 +249,13 @@ module.exports = async (req, res) => {
         }
       }
 
-      // Update in-memory fallback
       if (config) fallback.config = config;
       if (menu) fallback.menu = menu;
       storeMemory = fallback;
 
       return res.status(200).json({
         success: true,
-        message: '¡Ajustes guardados exitosamente en Vercel Storage!',
+        message: '¡Ajustes guardados exitosamente!',
         data: fallback
       });
     } catch (error) {
