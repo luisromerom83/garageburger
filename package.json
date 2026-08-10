@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/luisromerom83/garageburger#readme",
   "dependencies": {
-    "@supabase/supabase-js": "^2.112.2"
+    "@supabase/supabase-js": "^2.112.2",
+    "@vercel/edge-config": "^1.5.1",
+    "@vercel/kv": "^3.0.0",
+    "postgres": "^3.4.9"
   }
 }
