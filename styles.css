@@ -224,10 +224,6 @@ img {
   color: #fff;
 }
 
-.nav-link.highlights {
-  color: var(--primary-yellow);
-}
-
 /* Buttons */
 .btn {
   display: inline-flex;
@@ -333,7 +329,7 @@ img {
 /* Hero Section */
 .hero {
   position: relative;
-  padding: 100px 0 80px;
+  padding: 90px 0 70px;
   background: radial-gradient(circle at 80% 20%, rgba(255, 94, 0, 0.15) 0%, transparent 50%),
               radial-gradient(circle at 10% 80%, rgba(255, 183, 3, 0.1) 0%, transparent 40%),
               var(--bg-dark);
@@ -363,14 +359,14 @@ img {
 
 .hero-title {
   font-family: var(--font-heading);
-  font-size: 4rem;
+  font-size: 3.8rem;
   line-height: 0.95;
   letter-spacing: 1px;
   margin-bottom: 20px;
 }
 
 .hero-description {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   color: var(--text-muted);
   margin-bottom: 32px;
   max-width: 600px;
@@ -380,14 +376,15 @@ img {
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 40px;
+  margin-bottom: 36px;
 }
 
 .hero-features {
   display: flex;
-  gap: 24px;
+  gap: 20px;
+  flex-wrap: wrap;
   border-top: 1px solid var(--border-color);
-  padding-top: 24px;
+  padding-top: 20px;
 }
 
 .feature-item {
@@ -400,7 +397,7 @@ img {
 
 .feature-item i {
   color: var(--primary-yellow);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .hero-visual {
@@ -417,7 +414,7 @@ img {
 
 .hero-img {
   width: 100%;
-  height: 420px;
+  height: 400px;
   object-fit: cover;
   transition: var(--transition-smooth);
 }
@@ -449,6 +446,117 @@ img {
   font-weight: 800;
   color: var(--primary-yellow);
   font-size: 1.1rem;
+}
+
+/* NEW: Announcement Carousel Styles */
+.announcement-carousel-section {
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 50px 0;
+}
+
+.carousel-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 94, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.carousel-track-wrapper {
+  overflow: hidden;
+  width: 100%;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 40px;
+  gap: 30px;
+}
+
+.slide-content h2 {
+  font-family: var(--font-heading);
+  font-size: 2.8rem;
+  color: var(--primary-yellow);
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.slide-content p {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.slide-img-wrap {
+  height: 260px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.slide-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(15, 17, 21, 0.8);
+  border: 1px solid var(--primary-orange);
+  color: #fff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  z-index: 10;
+}
+
+.carousel-nav:hover {
+  background: var(--primary-orange);
+}
+
+.carousel-nav.prev-btn { left: 16px; }
+.carousel-nav.next-btn { right: 16px; }
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 0;
+  background: var(--bg-card);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.dot.active {
+  background: var(--primary-orange);
+  width: 26px;
+  border-radius: var(--radius-full);
 }
 
 /* Section Header */
@@ -621,70 +729,6 @@ img {
   background: var(--primary-orange);
   color: #fff;
   border-color: var(--primary-orange);
-}
-
-/* Star Wars Promo */
-.promo-starwars {
-  background: linear-gradient(135deg, #050b14 0%, #150d2a 100%);
-  border-top: 1px solid rgba(255, 183, 3, 0.2);
-  border-bottom: 1px solid rgba(255, 183, 3, 0.2);
-}
-
-.promo-starwars .container {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 40px;
-  align-items: center;
-}
-
-.starwars-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--primary-yellow);
-  font-family: var(--font-tech);
-  font-size: 0.85rem;
-  letter-spacing: 1px;
-  margin-bottom: 16px;
-}
-
-.starwars-title {
-  font-family: var(--font-heading);
-  font-size: 3.5rem;
-  color: var(--primary-yellow);
-  line-height: 1;
-  margin-bottom: 16px;
-  text-shadow: 0 0 15px rgba(255, 183, 3, 0.4);
-}
-
-.starwars-text {
-  color: var(--text-muted);
-  font-size: 1.05rem;
-  margin-bottom: 24px;
-}
-
-.sauces-pill-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.sauce-tag {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  font-size: 0.85rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.img-frame {
-  border-radius: var(--radius-md);
-  border: 2px solid var(--primary-yellow);
-  box-shadow: 0 0 30px rgba(255, 183, 3, 0.25);
 }
 
 /* Contact & Info */
@@ -1050,7 +1094,7 @@ img {
 
 /* Responsive Media Queries */
 @media (max-width: 900px) {
-  .hero-content, .promo-starwars .container {
+  .hero-content, .carousel-slide {
     grid-template-columns: 1fr;
   }
 

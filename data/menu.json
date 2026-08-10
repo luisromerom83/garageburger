@@ -7,7 +7,8 @@
     "description": "Jugosa carne de cerdo desmenuzada marinada en salsa BBQ especial con ensalada de col dulce en pan Brioche.",
     "image": "assets/pulledpork.png",
     "badge": "Especial de la Casa",
-    "available": true
+    "available": true,
+    "isFavorite": true
   },
   {
     "id": "costillas-bbq",
@@ -17,7 +18,8 @@
     "description": "Costillas de cerdo ahumadas bañadas en BBQ, puré de papa con gravy, Mac and Cheese o ensalada de col.",
     "image": "assets/Screenshot_20260810_105000.png",
     "badge": "Estrella",
-    "available": true
+    "available": true,
+    "isFavorite": true
   },
   {
     "id": "garage-burger-double",
@@ -27,7 +29,8 @@
     "description": "Doble carne de res sazonada, queso gouda fundido, tocino crujiente, cebolla caramelizada y aderezo especial.",
     "image": "assets/Screenshot_20260810_105331.png",
     "badge": "Popular",
-    "available": true
+    "available": true,
+    "isFavorite": true
   },
   {
     "id": "garage-burger-classic",
@@ -37,7 +40,8 @@
     "description": "100% carne de res jugosa, queso amarillo, lechuga fresca, jitomate y aderezo Garage.",
     "image": "assets/Screenshot_20260810_105350.png",
     "badge": "",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "boneless-150",
@@ -47,7 +51,8 @@
     "description": "Trozos de pechuga crujientes bañados en tu salsa favorita, acompañados de aderezo ranch, papas o aros de cebolla.",
     "image": "assets/Boneless.png",
     "badge": "Recomendado",
-    "available": true
+    "available": true,
+    "isFavorite": true
   },
   {
     "id": "bolitas-queso",
@@ -57,7 +62,8 @@
     "description": "Queso gouda sazonado y empanizado crujiente. 8 piezas acompañadas de dip.",
     "image": "assets/Screenshot_20260810_105331.png",
     "badge": "Snack",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "aros-cebolla",
@@ -67,7 +73,8 @@
     "description": "Aros de cebolla dorados y sazonados con especias secretas.",
     "image": "assets/Screenshot_20260810_105331.png",
     "badge": "Crujiente",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "cerveza-barril",
@@ -77,117 +84,129 @@
     "description": "Tarro helado de cerveza de barril de la casa.",
     "image": "assets/CervezadeBarril.png",
     "badge": "Favorito",
-    "available": true
+    "available": true,
+    "isFavorite": true
   },
   {
     "id": "cerveza-cuartito",
     "name": "Cerveza Cuartito",
-    category: "bebidas",
-    price: 25,
+    "category": "bebidas",
+    "price": 25,
     "description": "Presentación cuartito bien fría.",
     "image": "assets/CervezadeBarril.png",
     "badge": "",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "cerveza-media",
     "name": "Cerveza Media",
-    category: "bebidas",
-    price: 30,
+    "category": "bebidas",
+    "price": 30,
     "description": "Presentación media bien fría.",
     "image": "assets/CervezadeBarril.png",
     "badge": "",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "cerveza-raiz",
     "name": "Cerveza de Raíz",
-    category: "bebidas",
-    price: 70,
+    "category": "bebidas",
+    "price": 70,
     "description": "Refrescante cerveza de raíz artesanal.",
     "image": "assets/CervezadeBarril.png",
     "badge": "",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "cerveza-flotante",
     "name": "Cerveza de Raíz con Flotante",
-    category: "bebidas",
-    price: 100,
+    "category": "bebidas",
+    "price": 100,
     "description": "Cerveza de raíz con bola de nieve de vainilla cremosa.",
     "image": "assets/CervezadeBarril.png",
     "badge": "Especial",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "refresco",
     "name": "Refresco de Lata",
-    category: "bebidas",
-    price: 25,
+    "category": "bebidas",
+    "price": 25,
     "description": "Variedad de sabores bien fríos.",
     "image": "assets/CervezadeBarril.png",
     "badge": "",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "agua-natural",
     "name": "Agua Natural Botella",
-    category: "bebidas",
-    price: 15,
+    "category": "bebidas",
+    "price": 15,
     "description": "Botella de agua purificada 600ml.",
     "image": "assets/CervezadeBarril.png",
     "badge": "",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "salsa-crema-habanero",
     "name": "Salsa Crema de Habanero",
-    category: "salsas",
-    price: 15,
+    "category": "salsas",
+    "price": 15,
     "description": "Cremosa y picante, hecha en casa.",
     "image": "assets/menu.jpg",
     "badge": "Artesanal",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "salsa-pina-habanero",
     "name": "Salsa Piña Habanero",
-    category: "salsas",
-    price: 15,
+    "category": "salsas",
+    "price": 15,
     "description": "Toque dulce de piña caramelizada con picor de habanero.",
     "image": "assets/menu.jpg",
     "badge": "Top",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "salsa-mango-habanero",
     "name": "Salsa Mango Habanero",
-    category: "salsas",
-    price: 15,
+    "category": "salsas",
+    "price": 15,
     "description": "Sabor frutal intenso con verdadero habanero.",
     "image": "assets/menu.jpg",
     "badge": "Top",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "salsa-bbq-chipotle",
     "name": "Salsa BBQ Chipotle",
-    category: "salsas",
-    price: 15,
+    "category": "salsas",
+    "price": 15,
     "description": "Ahuma perfecto con el toque ahumado del chipotle.",
     "image": "assets/menu.jpg",
     "badge": "",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "extra-queso",
     "name": "Extra Queso Amarillo",
-    category: "extras",
-    price: 15,
+    "category": "extras",
+    "price": 15,
     "description": "Porción extra de queso fundido.",
     "image": "assets/menu.jpg",
     "badge": "",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "extra-ranch",
@@ -197,26 +216,29 @@
     "description": "Porción de aderezo ranch cremoso.",
     "image": "assets/menu.jpg",
     "badge": "",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "extra-aderezo-burger",
     "name": "Aderezo Burger",
-    category: "extras",
-    price: 35,
+    "category": "extras",
+    "price": 35,
     "description": "Aderezo secreto de la casa Garage.",
     "image": "assets/menu.jpg",
     "badge": "Secreto",
-    "available": true
+    "available": true,
+    "isFavorite": false
   },
   {
     "id": "extra-ensalada-col",
     "name": "Ensalada de Col Dulce",
-    category: "extras",
-    price: 25,
+    "category": "extras",
+    "price": 25,
     "description": "Porción individual de cole slaw dulce y crujiente.",
     "image": "assets/menu.jpg",
     "badge": "",
-    "available": true
+    "available": true,
+    "isFavorite": false
   }
 ]

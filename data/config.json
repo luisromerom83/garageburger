@@ -7,5 +7,38 @@
   "whatsappPhone": "522871270483",
   "secondaryPhone": "287 121 2221",
   "instagramUser": "GARAGE_BURGER_19",
-  "adminPin": "1234"
+  "adminPin": "1234",
+  "hero": {
+    "title": "HAMBURGUESAS JUGOSAS & CERVEZA DE BARRIL",
+    "description": "Disfruta de nuestras costillas BBQ ahumadas, Pulled Pork suave con ensalada de col en pan brioche, Boneless bañados en salsas habanero y aros de cebolla crujientes.",
+    "image": "assets/Screenshot_20260810_105331.png",
+    "badgeLabel": "Sabor Legendario",
+    "badgeHighlight": "¡Te vas a antojar!",
+    "features": [
+      { "icon": "fa-beer-mug-empty", "text": "Cerveza de Barril Helada" },
+      { "icon": "fa-drumstick-bite", "text": "Boneless 100% Pechuga" },
+      { "icon": "fa-award", "text": "Salsas Artesanales" }
+    ]
+  },
+  "categories": [
+    { "id": "hamburguesas", "name": "Hamburguesas & Specials" },
+    { "id": "boneless", "name": "Boneless & Snacks" },
+    { "id": "bebidas", "name": "Cervezas & Bebidas" },
+    { "id": "salsas", "name": "Salsas & Aderezos" },
+    { "id": "extras", "name": "Extras" }
+  ],
+  "announcements": [
+    {
+      "id": "ann-1",
+      "title": "ESPECIALES DE FIN DE SEMANA",
+      "description": "Pulled pork jugoso y costillas BBQ acompañadas de puré de papa con gravy, Mac and cheese y ensalada de col dulce en pan Brioche.",
+      "image": "assets/Screenshot_20260810_105000.png"
+    },
+    {
+      "id": "ann-2",
+      "title": "CERVEZA DE BARRIL BIEN FRÍA",
+      "description": "El maridaje perfecto para tus boneless y aros de cebolla crujientes. ¡Te esperamos a partir de las 7:00 PM!",
+      "image": "assets/CervezadeBarril.png"
+    }
+  ]
 }

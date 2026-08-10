@@ -25,11 +25,11 @@
       <span id="status-badge" class="badge-status open">
         <i class="fa-solid fa-circle"></i> <span id="status-text">Cargando horario...</span>
       </span>
-      <span class="schedule-info">
+      <span class="schedule-info" id="top-announcement-text">
         <i class="fa-regular fa-clock"></i> Jueves a Domingo: 7:00 PM - 11:00 PM
       </span>
-      <a href="https://wa.me/522871270483" target="_blank" class="top-contact">
-        <i class="fa-brands fa-whatsapp"></i> Pedidos: 287 127 0483 / 287 121 2221
+      <a href="https://wa.me/522871270483" id="top-whatsapp-link" target="_blank" class="top-contact">
+        <i class="fa-brands fa-whatsapp"></i> Pedidos por WhatsApp
       </a>
     </div>
   </div>
@@ -40,15 +40,15 @@
       <a href="#" class="brand-logo">
         <img src="assets/logo.png" alt="Garage Burger Logo" onerror="this.src='assets/ilovegarage.png'">
         <div class="brand-text">
-          <span class="brand-title">GARAGE BURGER</span>
-          <span class="brand-subtitle">BUEN AMBIENTE & MEJOR SABOR</span>
+          <span class="brand-title" id="nav-brand-title">GARAGE BURGER</span>
+          <span class="brand-subtitle" id="nav-brand-subtitle">BUEN AMBIENTE & MEJOR SABOR</span>
         </div>
       </a>
 
       <div class="nav-links">
+        <a href="#anuncios" class="nav-link">Novedades</a>
+        <a href="#especiales" class="nav-link">Favoritos</a>
         <a href="#menu" class="nav-link">Menú</a>
-        <a href="#especiales" class="nav-link">Especiales</a>
-        <a href="#starwars-promo" class="nav-link highlights"><i class="fa-solid fa-jedi text-yellow"></i> Menú Galáctico</a>
         <a href="#contacto" class="nav-link">Ubicación</a>
       </div>
 
@@ -60,25 +60,26 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
+  <!-- Hero Section (Fully Editable via Config) -->
   <header class="hero">
     <div class="hero-overlay"></div>
     <div class="container hero-content">
       <div class="hero-text-block">
-        <div class="badge-tag"><i class="fa-solid fa-fire-flame-curved"></i> ¡SÁBADO Y DOMINGO SE CENA BIEN!</div>
-        <h1 class="hero-title">HAMBURGUESAS JUGOSAS & <span class="text-gradient">CERVEZA DE BARRIL</span></h1>
-        <p class="hero-description">
+        <div class="badge-tag" id="hero-badge-tag"><i class="fa-solid fa-fire-flame-curved"></i> ¡BIENVENIDOS A GARAGE BURGER!</div>
+        <h1 class="hero-title" id="hero-title">HAMBURGUESAS JUGOSAS & <span class="text-gradient">CERVEZA DE BARRIL</span></h1>
+        <p class="hero-description" id="hero-description">
           Disfruta de nuestras costillas BBQ ahumadas, Pulled Pork suave con ensalada de col en pan brioche, Boneless bañados en salsas habanero y aros de cebolla crujientes.
         </p>
 
         <div class="hero-actions">
           <a href="#menu" class="btn btn-primary"><i class="fa-solid fa-utensils"></i> Explorar Menú</a>
-          <a href="https://wa.me/522871270483?text=Hola!%20Quiero%20hacer%20un%20pedido%20en%20Garage%20Burger" target="_blank" class="btn btn-whatsapp">
+          <a href="https://wa.me/522871270483" id="hero-wa-btn" target="_blank" class="btn btn-whatsapp">
             <i class="fa-brands fa-whatsapp"></i> Pedir por WhatsApp
           </a>
         </div>
 
-        <div class="hero-features">
+        <!-- Dynamic Hero Feature Tags -->
+        <div class="hero-features" id="hero-features-list">
           <div class="feature-item">
             <i class="fa-solid fa-beer-mug-empty"></i>
             <span>Cerveza de Barril Helada</span>
@@ -96,84 +97,52 @@
 
       <div class="hero-visual">
         <div class="hero-card-glow">
-          <img src="assets/Screenshot_20260810_105331.png" alt="Hamburguesa Garage Burger" class="hero-img">
+          <img src="assets/Screenshot_20260810_105331.png" id="hero-img" alt="Garage Burger Hero" class="hero-img">
           <div class="floating-badge badge-price">
-            <span class="label">Sabor Legendario</span>
-            <span class="highlight">¡Te vas a antojar!</span>
+            <span class="label" id="hero-badge-label">Sabor Legendario</span>
+            <span class="highlight" id="hero-badge-highlight">¡Te vas a antojar!</span>
           </div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Popular Specialties Carousel / Section -->
-  <section id="especiales" class="section bg-darker">
+  <!-- NEW: Announcement Carousel Section (Directly Below Hero) -->
+  <section id="anuncios" class="section bg-darker announcement-carousel-section">
+    <div class="container">
+      <div class="carousel-container">
+        <div class="carousel-track-wrapper">
+          <div class="carousel-track" id="carousel-track">
+            <!-- Carousel slides rendered dynamically from config.announcements -->
+          </div>
+        </div>
+
+        <!-- Carousel Navigation Controls -->
+        <button class="carousel-nav prev-btn" id="carousel-prev"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="carousel-nav next-btn" id="carousel-next"><i class="fa-solid fa-chevron-right"></i></button>
+        
+        <!-- Indicators -->
+        <div class="carousel-dots" id="carousel-dots"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Favoritos del Garage Section (Rendered from isFavorite: true) -->
+  <section id="especiales" class="section">
     <div class="container">
       <div class="section-header text-center">
-        <h2 class="section-title">LOS FAVORITOS DEL <span class="text-orange">GARAGE</span></h2>
-        <p class="section-subtitle">Preparados al momento con ingredientes de primera calidad</p>
+        <h2 class="section-title">LOS FAVORITOS DEL <span class="text-orange">GARAGE</span> ⭐</h2>
+        <p class="section-subtitle">Los platillos más pedidos por nuestros clientes estrella</p>
       </div>
 
-      <div class="grid grid-3">
-        <!-- Special 1 -->
-        <div class="card card-special">
-          <div class="card-img-wrap">
-            <img src="assets/pulledpork.png" alt="Pulled Pork Burger">
-            <span class="card-badge">Especial de la Casa</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-title">Pulled Pork & Brioche</h3>
-            <p class="card-text">Jugosa carne de cerdo desmenuzada, marinada en salsa BBQ especial, servida con ensalada de col dulce en pan Brioche artesanal.</p>
-            <div class="card-footer">
-              <span class="price">$160 MXN</span>
-              <button class="btn btn-sm btn-outline add-to-cart-direct" data-id="pulled-pork">
-                <i class="fa-solid fa-plus"></i> Agregar
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Special 2 -->
-        <div class="card card-special">
-          <div class="card-img-wrap">
-            <img src="assets/Screenshot_20260810_105000.png" alt="Costillas BBQ con Mac and Cheese">
-            <span class="card-badge badge-red">Súper Acompañado</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-title">Costillas BBQ Premium</h3>
-            <p class="card-text">Tiernas costillas ahumadas bañadas en salsa BBQ especial, acompañadas con puré de papa con gravy, Mac and Cheese o ensalada de col.</p>
-            <div class="card-footer">
-              <span class="price">$220 MXN</span>
-              <button class="btn btn-sm btn-outline add-to-cart-direct" data-id="costillas-bbq">
-                <i class="fa-solid fa-plus"></i> Agregar
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Special 3 -->
-        <div class="card card-special">
-          <div class="card-img-wrap">
-            <img src="assets/Boneless.png" alt="Boneless con Aros de Cebolla">
-            <span class="card-badge badge-yellow">Crujientes</span>
-          </div>
-          <div class="card-body">
-            <h3 class="card-title">Boneless Bañados ($150)</h3>
-            <p class="card-text">Trozos de pechuga crujientes bañados en tu salsa favorita (Mango Habanero, Piña Habanero, Teriyaki, Búfalo, etc.) con papas o aros de cebolla.</p>
-            <div class="card-footer">
-              <span class="price">$150 MXN</span>
-              <button class="btn btn-sm btn-outline add-to-cart-direct" data-id="boneless-150">
-                <i class="fa-solid fa-plus"></i> Agregar
-              </button>
-            </div>
-          </div>
-        </div>
+      <div id="favorites-grid" class="grid grid-3">
+        <!-- Rendered dynamically from isFavorite items -->
       </div>
     </div>
   </section>
 
   <!-- Interactive Menu Section -->
-  <section id="menu" class="section">
+  <section id="menu" class="section bg-darker">
     <div class="container">
       <div class="section-header">
         <div>
@@ -186,14 +155,9 @@
         </div>
       </div>
 
-      <!-- Categories Filter Tabs -->
-      <div class="filter-tabs">
-        <button class="filter-btn active" data-category="todos">Todos</button>
-        <button class="filter-btn" data-category="hamburguesas">Hamburguesas & Specials</button>
-        <button class="filter-btn" data-category="boneless">Boneless & Snacks</button>
-        <button class="filter-btn" data-category="bebidas">Cervezas & Bebidas</button>
-        <button class="filter-btn" data-category="salsas">Salsas & Aderezos</button>
-        <button class="filter-btn" data-category="extras">Extras</button>
+      <!-- Categories Filter Tabs (Dynamic) -->
+      <div class="filter-tabs" id="category-filter-tabs">
+        <!-- Tabs rendered dynamically from config.categories -->
       </div>
 
       <!-- Menu Items Grid -->
@@ -203,38 +167,8 @@
     </div>
   </section>
 
-  <!-- Star Wars Theme Special Banner -->
-  <section id="starwars-promo" class="section promo-starwars">
-    <div class="container">
-      <div class="starwars-content">
-        <div class="starwars-badge"><i class="fa-solid fa-jedi"></i> MENÚ TEMÁTICO EDICIÓN LIMITADA</div>
-        <h2 class="starwars-title">¡QUE LA FUERZA DEL SABOR TE ACOMPAÑE!</h2>
-        <p class="starwars-text">
-          Conoce nuestro menú inspirado en la galaxia. Disfruta de nuestras creaciones especiales y combina tus boneless y snacks con nuestra variedad de 10 salsas artesanales únicas.
-        </p>
-        <div class="sauces-pill-container">
-          <span class="sauce-tag"><i class="fa-solid fa-pepper-hot text-red"></i> Crema de Habanero</span>
-          <span class="sauce-tag"><i class="fa-solid fa-pepper-hot text-yellow"></i> Piña Habanero</span>
-          <span class="sauce-tag"><i class="fa-solid fa-pepper-hot text-orange"></i> Mango Habanero</span>
-          <span class="sauce-tag">Búfalo</span>
-          <span class="sauce-tag">BBQ Chipotle</span>
-          <span class="sauce-tag">Lemon Pepper</span>
-          <span class="sauce-tag">Tamarindo</span>
-          <span class="sauce-tag">Teriyaki</span>
-          <span class="sauce-tag">BBQ Clásica</span>
-        </div>
-        <div class="mt-4">
-          <a href="#menu" class="btn btn-yellow"><i class="fa-solid fa-fire"></i> Ver Menú de Salsas</a>
-        </div>
-      </div>
-      <div class="starwars-image">
-        <img src="assets/menu.jpg" alt="Garage Burger Star Wars Menu" class="img-frame">
-      </div>
-    </div>
-  </section>
-
   <!-- Location & Operating Hours -->
-  <section id="contacto" class="section bg-darker">
+  <section id="contacto" class="section">
     <div class="container">
       <div class="grid grid-2">
         <div class="contact-card">
@@ -248,7 +182,7 @@
               <div class="info-icon"><i class="fa-regular fa-clock"></i></div>
               <div>
                 <h4>Horario de Atención</h4>
-                <p>Jueves a Domingo: 7:00 PM a 11:00 PM</p>
+                <p id="schedule-text-info">Jueves a Domingo: 7:00 PM a 11:00 PM</p>
               </div>
             </div>
 
@@ -256,7 +190,7 @@
               <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
               <div>
                 <h4>Teléfonos de Pedidos</h4>
-                <p>287 121 2221 / 287 127 0483</p>
+                <p id="phones-text-info">287 121 2221 / 287 127 0483</p>
               </div>
             </div>
 
@@ -264,14 +198,14 @@
               <div class="info-icon"><i class="fa-brands fa-instagram"></i></div>
               <div>
                 <h4>Síguenos en Instagram</h4>
-                <p><a href="https://instagram.com/GARAGE_BURGER_19" target="_blank" class="text-orange">@GARAGE_BURGER_19</a></p>
+                <p><a href="https://instagram.com/GARAGE_BURGER_19" id="instagram-link" target="_blank" class="text-orange">@GARAGE_BURGER_19</a></p>
               </div>
             </div>
           </div>
 
           <div class="direct-wa-box">
             <h4>¿Tienes dudas o quieres pedir directamente?</h4>
-            <a href="https://wa.me/522871270483" target="_blank" class="btn btn-whatsapp btn-block">
+            <a href="https://wa.me/522871270483" id="direct-wa-chat-btn" target="_blank" class="btn btn-whatsapp btn-block">
               <i class="fa-brands fa-whatsapp"></i> Chatear con Garage Burger
             </a>
           </div>
@@ -302,8 +236,8 @@
         <p>© 2026 Garage Burger - Hamburguesas jugosas, cerveza de barril y el mejor sabor.</p>
       </div>
       <div class="footer-links">
-        <a href="https://instagram.com/GARAGE_BURGER_19" target="_blank"><i class="fa-brands fa-instagram"></i> Instagram</a>
-        <a href="https://wa.me/522871270483" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+        <a href="https://instagram.com/GARAGE_BURGER_19" id="footer-ig" target="_blank"><i class="fa-brands fa-instagram"></i> Instagram</a>
+        <a href="https://wa.me/522871270483" id="footer-wa" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
       </div>
     </div>
   </footer>
@@ -318,7 +252,6 @@
       </div>
 
       <div class="drawer-body" id="cart-items">
-        <!-- Rendered via JS -->
         <div class="empty-cart">
           <i class="fa-solid fa-basket-shopping"></i>
           <p>Tu carrito está vacío</p>

@@ -1,12 +1,14 @@
-// GarageBurger Dynamic Application Logic (JSON CMS Driven)
+// GarageBurger Dynamic Application Logic (JSON CMS + Vercel Storage API)
 
 let MENU_ITEMS = [];
 let STORE_CONFIG = {};
 let cart = [];
+let currentCarouselIndex = 0;
+let carouselInterval = null;
 
 // DOM Elements
 const menuGrid = document.getElementById('menu-grid');
-const filterBtns = document.querySelectorAll('.filter-btn');
+const categoryFilterTabs = document.getElementById('category-filter-tabs');
 const searchInput = document.getElementById('menu-search');
 const cartBtn = document.getElementById('cart-btn');
 const cartCount = document.getElementById('cart-count');
@@ -24,66 +26,123 @@ const statusText = document.getElementById('status-text');
 document.addEventListener('DOMContentLoaded', async () => {
   await loadStoreData();
   applyStoreConfig();
+  renderFavorites();
+  renderCategoryTabs();
   renderMenu(MENU_ITEMS);
   setupEventListeners();
+  initCarousel();
 });
 
-// Load Config & Menu from JSON or LocalStorage Draft Override
+// Load Config & Menu from Vercel API, JSON or LocalStorage Draft Override
 async function loadStoreData() {
   try {
-    // 1. Config
+    // 1. Try LocalStorage draft first (if user is editing in admin locally)
     const draftCfg = localStorage.getItem('gb_config_draft');
-    if (draftCfg) {
+    const draftMenu = localStorage.getItem('gb_menu_draft');
+
+    if (draftCfg && draftMenu) {
       STORE_CONFIG = JSON.parse(draftCfg);
-    } else {
-      const resCfg = await fetch('data/config.json');
-      STORE_CONFIG = await resCfg.json();
+      MENU_ITEMS = JSON.parse(draftMenu);
+      return;
     }
 
-    // 2. Menu
-    const draftMenu = localStorage.getItem('gb_menu_draft');
-    if (draftMenu) {
-      MENU_ITEMS = JSON.parse(draftMenu);
-    } else {
-      const resMenu = await fetch('data/menu.json');
-      MENU_ITEMS = await resMenu.json();
+    // 2. Try Vercel Serverless API /api/store
+    const resApi = await fetch('/api/store');
+    if (resApi.ok) {
+      const dataApi = await resApi.json();
+      if (dataApi.config && dataApi.menu) {
+        STORE_CONFIG = dataApi.config;
+        MENU_ITEMS = dataApi.menu;
+        return;
+      }
     }
+
+    // 3. Fallback to static JSON files
+    const resCfg = await fetch('data/config.json');
+    STORE_CONFIG = await resCfg.json();
+
+    const resMenu = await fetch('data/menu.json');
+    MENU_ITEMS = await resMenu.json();
   } catch (err) {
-    console.error('Error al cargar datos JSON:', err);
+    console.error('Error al cargar datos de tienda:', err);
   }
 }
 
-// Apply Store Config (Banner, Status, WhatsApp Number)
+// Apply Store Config (Hero, Announcement, Operating Status, WhatsApp, Categories)
 function applyStoreConfig() {
-  // Banner
-  const announcementEl = document.querySelector('.announcement-content .schedule-info');
-  if (announcementEl && STORE_CONFIG.announcementText) {
-    announcementEl.innerHTML = `<i class="fa-solid fa-bullhorn"></i> ${STORE_CONFIG.announcementText}`;
+  // Brand Header
+  if (STORE_CONFIG.storeName) document.getElementById('nav-brand-title').textContent = STORE_CONFIG.storeName;
+  if (STORE_CONFIG.storeSubtitle) document.getElementById('nav-brand-subtitle').textContent = STORE_CONFIG.storeSubtitle;
+
+  // Top Announcement Banner
+  const topAnnouncement = document.getElementById('top-announcement-text');
+  if (topAnnouncement && STORE_CONFIG.announcementText) {
+    topAnnouncement.innerHTML = `<i class="fa-solid fa-bullhorn"></i> ${STORE_CONFIG.announcementText}`;
   }
 
-  // Operating status
+  // Links & Phone Numbers
+  const phone = STORE_CONFIG.whatsappPhone || '522871270483';
+  const waUrl = `https://wa.me/${phone}`;
+
+  document.getElementById('top-whatsapp-link').href = waUrl;
+  document.getElementById('hero-wa-btn').href = waUrl;
+  document.getElementById('direct-wa-chat-btn').href = waUrl;
+  document.getElementById('footer-wa').href = waUrl;
+
+  if (STORE_CONFIG.scheduleText) {
+    document.getElementById('schedule-text-info').textContent = STORE_CONFIG.scheduleText;
+  }
+  if (STORE_CONFIG.secondaryPhone || STORE_CONFIG.whatsappPhone) {
+    document.getElementById('phones-text-info').textContent = `${STORE_CONFIG.secondaryPhone || ''} / ${STORE_CONFIG.whatsappPhone || ''}`;
+  }
+  if (STORE_CONFIG.instagramUser) {
+    const igUrl = `https://instagram.com/${STORE_CONFIG.instagramUser}`;
+    document.getElementById('instagram-link').href = igUrl;
+    document.getElementById('instagram-link').textContent = `@${STORE_CONFIG.instagramUser}`;
+    document.getElementById('footer-ig').href = igUrl;
+  }
+
+  // Hero Section Dynamic Rendering
+  const hero = STORE_CONFIG.hero || {};
+  if (hero.title) document.getElementById('hero-title').innerHTML = hero.title;
+  if (hero.description) document.getElementById('hero-description').textContent = hero.description;
+  if (hero.image) document.getElementById('hero-img').src = hero.image;
+  if (hero.badgeLabel) document.getElementById('hero-badge-label').textContent = hero.badgeLabel;
+  if (hero.badgeHighlight) document.getElementById('hero-badge-highlight').textContent = hero.badgeHighlight;
+
+  if (hero.features && hero.features.length > 0) {
+    const featuresContainer = document.getElementById('hero-features-list');
+    featuresContainer.innerHTML = hero.features.map(f => `
+      <div class="feature-item">
+        <i class="fa-solid ${f.icon || 'fa-star'}"></i>
+        <span>${f.text}</span>
+      </div>
+    `).join('');
+  }
+
+  // Status check
   checkOperatingStatus();
 }
 
-// Check Operating Hours & Override Logic
+// Operating Status Check
 function checkOperatingStatus() {
   const override = STORE_CONFIG.statusOverride || 'auto';
 
   if (override === 'open') {
     statusBadge.className = 'badge-status open';
-    statusText.textContent = 'ABIERTO AHORA (FORZADO)';
+    statusText.textContent = 'ABIERTO AHORA';
     return;
   }
 
   if (override === 'closed') {
     statusBadge.className = 'badge-status closed';
-    statusText.textContent = 'CERRADO (POR EL MOMENTO)';
+    statusText.textContent = 'CERRADO POR EL MOMENTO';
     return;
   }
 
   // Automatic Day & Hour Check
   const now = new Date();
-  const day = now.getDay(); // 0 = Domingo, 4 = Jueves, 5 = Viernes, 6 = Sábado
+  const day = now.getDay();
   const hour = now.getHours();
 
   const isOperatingDay = [0, 4, 5, 6].includes(day);
@@ -96,6 +155,125 @@ function checkOperatingStatus() {
     statusBadge.className = 'badge-status closed';
     statusText.textContent = 'CERRADO (Abrimos Jue-Dom 7PM)';
   }
+}
+
+// Render Announcement Carousel
+function initCarousel() {
+  const announcements = STORE_CONFIG.announcements || [];
+  const track = document.getElementById('carousel-track');
+  const dotsContainer = document.getElementById('carousel-dots');
+  const prevBtn = document.getElementById('carousel-prev');
+  const nextBtn = document.getElementById('carousel-next');
+
+  if (announcements.length === 0) {
+    document.querySelector('.announcement-carousel-section').style.display = 'none';
+    return;
+  }
+
+  document.querySelector('.announcement-carousel-section').style.display = 'block';
+
+  track.innerHTML = announcements.map(ann => `
+    <div class="carousel-slide">
+      <div class="slide-content">
+        <h2>${ann.title}</h2>
+        <p>${ann.description}</p>
+      </div>
+      <div class="slide-img-wrap">
+        <img src="${ann.image}" alt="${ann.title}" onerror="this.src='assets/Screenshot_20260810_105000.png'">
+      </div>
+    </div>
+  `).join('');
+
+  dotsContainer.innerHTML = announcements.map((_, i) => `
+    <span class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></span>
+  `).join('');
+
+  prevBtn.onclick = () => {
+    currentCarouselIndex = (currentCarouselIndex - 1 + announcements.length) % announcements.length;
+    updateCarousel();
+  };
+
+  nextBtn.onclick = () => {
+    currentCarouselIndex = (currentCarouselIndex + 1) % announcements.length;
+    updateCarousel();
+  };
+
+  startAutoPlay(announcements.length);
+}
+
+function updateCarousel() {
+  const track = document.getElementById('carousel-track');
+  const dots = document.querySelectorAll('.carousel-dots .dot');
+
+  track.style.transform = `translateX(-${currentCarouselIndex * 100}%)`;
+
+  dots.forEach((dot, i) => {
+    dot.className = `dot ${i === currentCarouselIndex ? 'active' : ''}`;
+  });
+}
+
+window.goToSlide = function(index) {
+  currentCarouselIndex = index;
+  updateCarousel();
+};
+
+function startAutoPlay(length) {
+  if (carouselInterval) clearInterval(carouselInterval);
+  carouselInterval = setInterval(() => {
+    currentCarouselIndex = (currentCarouselIndex + 1) % length;
+    updateCarousel();
+  }, 6000);
+}
+
+// Render Favoritos (isFavorite: true)
+function renderFavorites() {
+  const favoritesGrid = document.getElementById('favorites-grid');
+  const favorites = MENU_ITEMS.filter(item => item.isFavorite === true);
+
+  if (favorites.length === 0) {
+    favoritesGrid.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Próximamente más recomendados...</p>`;
+    return;
+  }
+
+  favoritesGrid.innerHTML = favorites.map(item => `
+    <div class="card card-special">
+      <div class="card-img-wrap">
+        <img src="${item.image}" alt="${item.name}" onerror="this.src='assets/ilovegarage.png'">
+        <span class="card-badge badge-yellow">⭐ Favorito</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">${item.name}</h3>
+        <p class="card-text">${item.description}</p>
+        <div class="card-footer">
+          <span class="price">$${item.price} MXN</span>
+          <button class="btn btn-sm btn-outline add-to-cart-btn" data-id="${item.id}">
+            <i class="fa-solid fa-plus"></i> Agregar
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Render Categories Tabs Dynamically from Config
+function renderCategoryTabs() {
+  const categories = STORE_CONFIG.categories || [
+    { id: 'todos', name: 'Todos' },
+    { id: 'hamburguesas', name: 'Hamburguesas & Specials' },
+    { id: 'boneless', name: 'Boneless & Snacks' },
+    { id: 'bebidas', name: 'Cervezas & Bebidas' },
+    { id: 'salsas', name: 'Salsas & Aderezos' },
+    { id: 'extras', name: 'Extras' }
+  ];
+
+  let html = `<button class="filter-btn active" data-category="todos">Todos</button>`;
+  categories.forEach(cat => {
+    if (cat.id !== 'todos') {
+      html += `<button class="filter-btn" data-category="${cat.id}">${cat.name}</button>`;
+    }
+  });
+
+  categoryFilterTabs.innerHTML = html;
 }
 
 // Render Menu Cards
@@ -137,7 +315,6 @@ function renderMenu(items) {
     `;
   }).join('');
 
-  // Re-attach add to cart click listeners
   document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const id = e.currentTarget.getAttribute('data-id');
@@ -146,30 +323,23 @@ function renderMenu(items) {
   });
 }
 
-// Filter and Search Logic
+// Filter and Search Event Listeners
 function setupEventListeners() {
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const cat = btn.getAttribute('data-category');
+  categoryFilterTabs.addEventListener('click', (e) => {
+    if (e.target.classList.contains('filter-btn')) {
+      document.querySelectorAll('#category-filter-tabs .filter-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      const cat = e.target.getAttribute('data-category');
       const query = searchInput.value.toLowerCase().trim();
       filterMenu(cat, query);
-    });
+    }
   });
 
   searchInput.addEventListener('input', (e) => {
-    const activeTab = document.querySelector('.filter-btn.active').getAttribute('data-category');
+    const activeTabEl = document.querySelector('#category-filter-tabs .filter-btn.active');
+    const activeTab = activeTabEl ? activeTabEl.getAttribute('data-category') : 'todos';
     const query = e.target.value.toLowerCase().trim();
     filterMenu(activeTab, query);
-  });
-
-  document.querySelectorAll('.add-to-cart-direct').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const id = e.currentTarget.getAttribute('data-id');
-      addToCart(id);
-      openCartDrawer();
-    });
   });
 
   cartBtn.addEventListener('click', openCartDrawer);
@@ -196,7 +366,7 @@ function filterMenu(category, query) {
   renderMenu(filtered);
 }
 
-// Cart Management
+// Cart Logic
 function addToCart(itemId) {
   const item = MENU_ITEMS.find(i => i.id === itemId);
   if (!item || item.available === false) return;
@@ -210,7 +380,6 @@ function addToCart(itemId) {
   }
 
   updateCartUI();
-
   cartBtn.style.transform = 'scale(1.1)';
   setTimeout(() => cartBtn.style.transform = 'scale(1)', 200);
 }
@@ -220,10 +389,7 @@ window.updateCartQty = function(itemId, delta) {
   if (index === -1) return;
 
   cart[index].qty += delta;
-
-  if (cart[index].qty <= 0) {
-    cart.splice(index, 1);
-  }
+  if (cart[index].qty <= 0) cart.splice(index, 1);
 
   updateCartUI();
 };
@@ -270,7 +436,6 @@ function closeCartDrawer() {
   cartDrawer.classList.remove('active');
 }
 
-// Generate formatted WhatsApp message
 function sendWhatsAppOrder() {
   if (cart.length === 0) {
     alert('Por favor agrega platillos a tu pedido antes de enviar.');

@@ -1,4 +1,4 @@
-// Admin Dashboard CMS Logic for GarageBurger
+// Admin Dashboard CMS Logic with Vercel API Integration for GarageBurger
 
 let adminMenu = [];
 let adminConfig = {};
@@ -8,21 +8,30 @@ const loginOverlay = document.getElementById('login-overlay');
 const pinInput = document.getElementById('pin-input');
 const loginBtn = document.getElementById('login-btn');
 const logoutBtn = document.getElementById('logout-btn');
+const saveAllVercelBtn = document.getElementById('save-all-vercel-btn');
 
+// Hero Inputs
+const heroTitleInput = document.getElementById('hero-title-input');
+const heroImageInput = document.getElementById('hero-image-input');
+const heroDescInput = document.getElementById('hero-desc-input');
+const heroBadgeLabelInput = document.getElementById('hero-badge-label-input');
+const heroBadgeHighlightInput = document.getElementById('hero-badge-highlight-input');
+const heroFeaturesEditor = document.getElementById('hero-features-editor');
+const addFeatureTagBtn = document.getElementById('add-feature-tag-btn');
+
+// Announcement Inputs
+const announcementsEditorList = document.getElementById('announcements-editor-list');
+const addAnnouncementBtn = document.getElementById('add-announcement-btn');
+
+// Status & Categories Inputs
 const statusBtns = document.querySelectorAll('.status-btn');
 const cfgWa = document.getElementById('cfg-wa');
-const cfgAnnouncement = document.getElementById('cfg-announcement');
-const saveConfigBtn = document.getElementById('save-config-btn');
+const categoriesEditorList = document.getElementById('categories-editor-list');
+const addCategoryBtn = document.getElementById('add-category-btn');
 
+// Product Table Inputs
 const adminMenuRows = document.getElementById('admin-menu-rows');
 const addItemBtn = document.getElementById('add-item-btn');
-
-const configJsonView = document.getElementById('config-json-view');
-const menuJsonView = document.getElementById('menu-json-view');
-const copyCfgBtn = document.getElementById('copy-cfg-btn');
-const copyMenuBtn = document.getElementById('copy-menu-btn');
-const exportJsonBtn = document.getElementById('export-json-btn');
-const resetDraftBtn = document.getElementById('reset-draft-btn');
 
 document.addEventListener('DOMContentLoaded', () => {
   checkAuthStatus();
@@ -30,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
   setupAdminListeners();
 });
 
-// Authentication
 function checkAuthStatus() {
   const isAuth = sessionStorage.getItem('gb_admin_auth');
   if (isAuth === 'true') {
@@ -56,6 +64,8 @@ function setupAdminListeners() {
     loginOverlay.style.display = 'flex';
   });
 
+  saveAllVercelBtn.addEventListener('click', saveAllToVercelStorage);
+
   // Status toggle
   statusBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -63,72 +73,98 @@ function setupAdminListeners() {
       const st = btn.getAttribute('data-status');
       btn.className = `status-btn active ${st}`;
       adminConfig.statusOverride = st;
-      updateJsonPreviews();
     });
   });
 
-  // Save config
-  saveConfigBtn.addEventListener('click', () => {
-    adminConfig.whatsappPhone = cfgWa.value.trim();
-    adminConfig.announcementText = cfgAnnouncement.value.trim();
-    saveLocalState();
-    alert('¡Ajustes de tienda guardados en borrador!');
+  // Feature Tag add
+  addFeatureTagBtn.addEventListener('click', () => {
+    if (!adminConfig.hero.features) adminConfig.hero.features = [];
+    adminConfig.hero.features.push({ icon: 'fa-star', text: 'Nueva Etiqueta' });
+    renderHeroFeatures();
   });
 
-  // Add Item
+  // Announcement slide add
+  addAnnouncementBtn.addEventListener('click', () => {
+    if (!adminConfig.announcements) adminConfig.announcements = [];
+    adminConfig.announcements.push({
+      id: `ann-${Date.now()}`,
+      title: 'NUEVO ANUNCIO',
+      description: 'Descripción del anuncio o promoción del fin de semana...',
+      image: 'assets/Screenshot_20260810_105000.png'
+    });
+    renderAnnouncementsEditor();
+  });
+
+  // Category add
+  addCategoryBtn.addEventListener('click', () => {
+    if (!adminConfig.categories) adminConfig.categories = [];
+    const catName = prompt('Nombre de la nueva categoría (Ej: Postres):');
+    if (catName) {
+      const catId = catName.toLowerCase().replace(/[^a-z0-9]/g, '');
+      adminConfig.categories.push({ id: catId, name: catName });
+      renderCategoriesEditor();
+    }
+  });
+
+  // Product Add
   addItemBtn.addEventListener('click', () => {
     const newItem = {
       id: `item-${Date.now()}`,
       name: 'Nuevo Platillo',
-      category: 'hamburguesas',
+      category: adminConfig.categories && adminConfig.categories.length > 0 ? adminConfig.categories[0].id : 'hamburguesas',
       price: 100,
       description: 'Descripción del platillo...',
       image: 'assets/Screenshot_20260810_105331.png',
       badge: '',
-      available: true
+      available: true,
+      isFavorite: false
     };
     adminMenu.push(newItem);
     renderAdminTable();
-    saveLocalState();
   });
-
-  // Export JSON
-  exportJsonBtn.addEventListener('click', downloadJsonFiles);
-  resetDraftBtn.addEventListener('click', resetDraftState);
-
-  // Copy buttons
-  copyCfgBtn.addEventListener('click', () => copyToClipboard(JSON.stringify(adminConfig, null, 2), 'config.json'));
-  copyMenuBtn.addEventListener('click', () => copyToClipboard(JSON.stringify(adminMenu, null, 2), 'menu.json'));
 }
 
 async function loadAdminData() {
-  // Load Config
-  const localCfg = localStorage.getItem('gb_config_draft');
-  if (localCfg) {
-    adminConfig = JSON.parse(localCfg);
-  } else {
-    const res = await fetch('data/config.json');
-    adminConfig = await res.json();
-  }
+  try {
+    const resApi = await fetch('/api/store');
+    if (resApi.ok) {
+      const dataApi = await resApi.json();
+      if (dataApi.config && dataApi.menu) {
+        adminConfig = dataApi.config;
+        adminMenu = dataApi.menu;
+        populateAllFields();
+        return;
+      }
+    }
 
-  // Load Menu
-  const localMenu = localStorage.getItem('gb_menu_draft');
-  if (localMenu) {
-    adminMenu = JSON.parse(localMenu);
-  } else {
-    const res = await fetch('data/menu.json');
-    adminMenu = await res.json();
-  }
+    // Fallback static
+    const resCfg = await fetch('data/config.json');
+    adminConfig = await resCfg.json();
 
-  populateConfigForm();
-  renderAdminTable();
-  updateJsonPreviews();
+    const resMenu = await fetch('data/menu.json');
+    adminMenu = await resMenu.json();
+
+    populateAllFields();
+  } catch (err) {
+    console.error('Error al cargar datos en admin:', err);
+  }
 }
 
-function populateConfigForm() {
-  cfgWa.value = adminConfig.whatsappPhone || '522871270483';
-  cfgAnnouncement.value = adminConfig.announcementText || '';
+function populateAllFields() {
+  // Hero fields
+  const hero = adminConfig.hero || {};
+  heroTitleInput.value = hero.title || '';
+  heroImageInput.value = hero.image || '';
+  heroDescInput.value = hero.description || '';
+  heroBadgeLabelInput.value = hero.badgeLabel || '';
+  heroBadgeHighlightInput.value = hero.badgeHighlight || '';
+  renderHeroFeatures();
 
+  // Announcements
+  renderAnnouncementsEditor();
+
+  // Status & WhatsApp
+  cfgWa.value = adminConfig.whatsappPhone || '522871270483';
   const st = adminConfig.statusOverride || 'auto';
   statusBtns.forEach(btn => {
     if (btn.getAttribute('data-status') === st) {
@@ -137,28 +173,104 @@ function populateConfigForm() {
       btn.className = 'status-btn';
     }
   });
+
+  // Categories
+  renderCategoriesEditor();
+
+  // Products
+  renderAdminTable();
 }
 
+function renderHeroFeatures() {
+  const features = (adminConfig.hero && adminConfig.hero.features) || [];
+  heroFeaturesEditor.innerHTML = features.map((f, i) => `
+    <div class="list-item-row">
+      <input type="text" class="form-control" style="width: 140px;" value="${f.icon || 'fa-star'}" placeholder="fa-icon" onchange="updateFeatureTag(${i}, 'icon', this.value)">
+      <input type="text" class="form-control" value="${f.text}" placeholder="Texto etiqueta" onchange="updateFeatureTag(${i}, 'text', this.value)">
+      <button class="btn btn-sm btn-outline" style="color: var(--accent-red);" onclick="deleteFeatureTag(${i})"><i class="fa-solid fa-trash"></i></button>
+    </div>
+  `).join('');
+}
+
+window.updateFeatureTag = function(index, key, val) {
+  adminConfig.hero.features[index][key] = val;
+};
+
+window.deleteFeatureTag = function(index) {
+  adminConfig.hero.features.splice(index, 1);
+  renderHeroFeatures();
+};
+
+function renderAnnouncementsEditor() {
+  const announcements = adminConfig.announcements || [];
+  announcementsEditorList.innerHTML = announcements.map((ann, i) => `
+    <div style="background: var(--bg-dark); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 16px;">
+      <div class="grid grid-2" style="margin-bottom: 10px;">
+        <input type="text" class="form-control" value="${ann.title}" placeholder="Título Anuncio" onchange="updateAnnouncement(${i}, 'title', this.value)">
+        <input type="text" class="form-control" value="${ann.image}" placeholder="URL Imagen Anuncio" onchange="updateAnnouncement(${i}, 'image', this.value)">
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <textarea class="form-control" rows="2" placeholder="Descripción del anuncio..." onchange="updateAnnouncement(${i}, 'description', this.value)">${ann.description}</textarea>
+        <button class="btn btn-sm btn-outline" style="color: var(--accent-red); height: 42px;" onclick="deleteAnnouncement(${i})"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.updateAnnouncement = function(index, key, val) {
+  adminConfig.announcements[index][key] = val;
+};
+
+window.deleteAnnouncement = function(index) {
+  adminConfig.announcements.splice(index, 1);
+  renderAnnouncementsEditor();
+};
+
+function renderCategoriesEditor() {
+  const categories = adminConfig.categories || [];
+  categoriesEditorList.innerHTML = categories.map((cat, i) => `
+    <div class="list-item-row">
+      <input type="text" class="form-control" style="width: 140px;" value="${cat.id}" placeholder="ID categoría" onchange="updateCategory(${i}, 'id', this.value)">
+      <input type="text" class="form-control" value="${cat.name}" placeholder="Nombre categoría" onchange="updateCategory(${i}, 'name', this.value)">
+      <button class="btn btn-sm btn-outline" style="color: var(--accent-red);" onclick="deleteCategory(${i})"><i class="fa-solid fa-trash"></i></button>
+    </div>
+  `).join('');
+}
+
+window.updateCategory = function(index, key, val) {
+  adminConfig.categories[index][key] = val;
+  renderAdminTable();
+};
+
+window.deleteCategory = function(index) {
+  adminConfig.categories.splice(index, 1);
+  renderCategoriesEditor();
+  renderAdminTable();
+};
+
 function renderAdminTable() {
+  const categories = adminConfig.categories || [];
+
   adminMenuRows.innerHTML = adminMenu.map((item, index) => `
     <tr>
+      <td style="text-align: center;">
+        <button class="star-btn ${item.isFavorite ? 'active' : ''}" onclick="toggleFavorite(${index})">
+          <i class="${item.isFavorite ? 'fa-solid' : 'fa-regular'} fa-star"></i>
+        </button>
+      </td>
+      <td>
+        <input type="text" class="form-control" style="width: 140px;" value="${item.image}" onchange="updateItem(${index}, 'image', this.value)">
+      </td>
       <td>
         <input type="text" class="form-control" value="${item.name}" onchange="updateItem(${index}, 'name', this.value)">
       </td>
       <td>
         <select class="form-control" onchange="updateItem(${index}, 'category', this.value)">
-          <option value="hamburguesas" ${item.category === 'hamburguesas' ? 'selected' : ''}>Hamburguesas</option>
-          <option value="boneless" ${item.category === 'boneless' ? 'selected' : ''}>Boneless & Snacks</option>
-          <option value="bebidas" ${item.category === 'bebidas' ? 'selected' : ''}>Cervezas & Bebidas</option>
-          <option value="salsas" ${item.category === 'salsas' ? 'selected' : ''}>Salsas</option>
-          <option value="extras" ${item.category === 'extras' ? 'selected' : ''}>Extras</option>
+          ${categories.map(c => `<option value="${c.id}" ${item.category === c.id ? 'selected' : ''}>${c.name}</option>`).join('')}
         </select>
       </td>
       <td>
         <input type="number" class="form-control" value="${item.price}" style="width: 90px;" onchange="updateItem(${index}, 'price', parseFloat(this.value))">
-      </td>
-      <td>
-        <input type="text" class="form-control" value="${item.badge || ''}" placeholder="Ej: Top" onchange="updateItem(${index}, 'badge', this.value)">
       </td>
       <td>
         <span class="badge-toggle ${item.available ? 'in-stock' : 'out-stock'}" onclick="toggleAvailability(${index})">
@@ -174,61 +286,65 @@ function renderAdminTable() {
 
 window.updateItem = function(index, field, value) {
   adminMenu[index][field] = value;
-  saveLocalState();
+};
+
+window.toggleFavorite = function(index) {
+  adminMenu[index].isFavorite = !adminMenu[index].isFavorite;
+  renderAdminTable();
 };
 
 window.toggleAvailability = function(index) {
   adminMenu[index].available = !adminMenu[index].available;
   renderAdminTable();
-  saveLocalState();
 };
 
 window.deleteItem = function(index) {
   if (confirm(`¿Eliminar ${adminMenu[index].name}?`)) {
     adminMenu.splice(index, 1);
     renderAdminTable();
-    saveLocalState();
   }
 };
 
-function saveLocalState() {
-  localStorage.setItem('gb_config_draft', JSON.stringify(adminConfig));
-  localStorage.setItem('gb_menu_draft', JSON.stringify(adminMenu));
-  updateJsonPreviews();
-}
+// Save All to Vercel Storage via /api/store
+async function saveAllToVercelStorage() {
+  // Sync Hero inputs to adminConfig object
+  if (!adminConfig.hero) adminConfig.hero = {};
+  adminConfig.hero.title = heroTitleInput.value.trim();
+  adminConfig.hero.image = heroImageInput.value.trim();
+  adminConfig.hero.description = heroDescInput.value.trim();
+  adminConfig.hero.badgeLabel = heroBadgeLabelInput.value.trim();
+  adminConfig.hero.badgeHighlight = heroBadgeHighlightInput.value.trim();
+  adminConfig.whatsappPhone = cfgWa.value.trim();
 
-function updateJsonPreviews() {
-  configJsonView.textContent = JSON.stringify(adminConfig, null, 2);
-  menuJsonView.textContent = JSON.stringify(adminMenu, null, 2);
-}
+  saveAllVercelBtn.disabled = true;
+  saveAllVercelBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
 
-function downloadJsonFiles() {
-  downloadBlob(JSON.stringify(adminConfig, null, 2), 'config.json', 'application/json');
-  setTimeout(() => {
-    downloadBlob(JSON.stringify(adminMenu, null, 2), 'menu.json', 'application/json');
-  }, 500);
-}
+  try {
+    const pin = adminConfig.adminPin || '1234';
+    const response = await fetch('/api/store', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pin: pin,
+        config: adminConfig,
+        menu: adminMenu
+      })
+    });
 
-function downloadBlob(content, filename, contentType) {
-  const blob = new Blob([content], { type: contentType });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+    const result = await response.json();
 
-function copyToClipboard(text, name) {
-  navigator.clipboard.writeText(text).then(() => {
-    alert(`¡${name} copiado al portapapeles!`);
-  });
-}
-
-function resetDraftState() {
-  if (confirm('¿Restablecer el borrador a los valores JSON originales?')) {
-    localStorage.removeItem('gb_config_draft');
-    localStorage.removeItem('gb_menu_draft');
-    loadAdminData();
+    if (response.ok && result.success) {
+      // Clear local drafts so site always uses live storage API
+      localStorage.removeItem('gb_config_draft');
+      localStorage.removeItem('gb_menu_draft');
+      alert('¡Excelente! Los cambios se han guardado directamente en Vercel Storage y ya están EN VIVO.');
+    } else {
+      alert('Error guardando en Vercel Storage: ' + (result.error || 'Intenta de nuevo.'));
+    }
+  } catch (err) {
+    alert('Error al conectar con la API de Vercel Storage: ' + err.message);
+  } finally {
+    saveAllVercelBtn.disabled = false;
+    saveAllVercelBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Guardar Cambios en Vivo`;
   }
 }

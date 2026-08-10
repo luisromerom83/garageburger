@@ -39,7 +39,7 @@
       padding: 16px 0;
     }
     .admin-container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 40px auto;
       padding: 0 20px;
     }
@@ -116,6 +116,19 @@
     }
     .badge-toggle.in-stock { background: rgba(46,204,113,0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
     .badge-toggle.out-stock { background: rgba(230,57,70,0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
+    .star-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.3rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+    .star-btn.active {
+      color: var(--primary-yellow);
+      text-shadow: 0 0 10px rgba(255, 183, 3, 0.5);
+    }
     
     .json-preview {
       background: #050608;
@@ -124,10 +137,17 @@
       font-family: monospace;
       padding: 16px;
       border-radius: var(--radius-sm);
-      height: 250px;
+      height: 200px;
       overflow-y: auto;
       white-space: pre-wrap;
       font-size: 0.8rem;
+    }
+
+    .list-item-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -167,24 +187,82 @@
     <!-- Quick Actions Banner -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 16px;">
       <div>
-        <h1 style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--primary-yellow);">GESTOR DE CONFIGURACIÓN & MENÚ</h1>
-        <p style="color: var(--text-muted);">Edita precios, oculta platillos o cambia el anuncio en vivo sin base de datos.</p>
+        <h1 style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--primary-yellow);">GESTOR CMS & STORAGE</h1>
+        <p style="color: var(--text-muted);">Administra la presentación, carrusel de anuncios, categorías y favoritos en tiempo real.</p>
       </div>
       <div style="display: flex; gap: 12px;">
-        <button id="export-json-btn" class="btn btn-primary"><i class="fa-solid fa-download"></i> Descargar JSONs</button>
-        <button id="reset-draft-btn" class="btn btn-outline"><i class="fa-solid fa-rotate-left"></i> Restablecer Valores</button>
+        <button id="save-all-vercel-btn" class="btn btn-primary btn-lg"><i class="fa-solid fa-cloud-arrow-up"></i> Guardar Cambios en Vivo</button>
       </div>
     </div>
 
-    <!-- Section 1: Store Config -->
+    <!-- Section 1: Hero / Presentation Editor -->
     <div class="admin-card">
       <h3 style="font-family: var(--font-heading); font-size: 1.6rem; margin-bottom: 20px; color: #fff;">
-        <i class="fa-solid fa-sliders text-orange"></i> 1. Estado y Avisos del Restaurante
+        <i class="fa-solid fa-display text-orange"></i> 1. Presentación Principal (Hero Section)
       </h3>
 
       <div class="grid grid-2">
         <div class="form-group">
-          <label>Control Manual de Estado (Abierto / Cerrado):</label>
+          <label>Título Principal del Hero:</label>
+          <input type="text" id="hero-title-input" class="form-control" placeholder="HAMBURGUESAS JUGOSAS & CERVEZA DE BARRIL">
+        </div>
+        <div class="form-group">
+          <label>URL de Imagen Principal (Costado Derecho):</label>
+          <input type="text" id="hero-image-input" class="form-control" placeholder="assets/Screenshot_20260810_105331.png">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Descripción / Texto de Presentación:</label>
+        <textarea id="hero-desc-input" class="form-control" rows="3"></textarea>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label>Insignia Etiqueta Superior:</label>
+          <input type="text" id="hero-badge-label-input" class="form-control" placeholder="Sabor Legendario">
+        </div>
+        <div class="form-group">
+          <label>Insignia Texto Resaltado:</label>
+          <input type="text" id="hero-badge-highlight-input" class="form-control" placeholder="¡Te vas a antojar!">
+        </div>
+      </div>
+
+      <!-- Feature Tags Editor -->
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <label style="margin-bottom: 0;">Etiquetas Flotantes de la Presentación (Tags):</label>
+          <button id="add-feature-tag-btn" class="btn btn-sm btn-yellow"><i class="fa-solid fa-plus"></i> Agregar Tag</button>
+        </div>
+        <div id="hero-features-editor">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Announcement Carousel Editor -->
+    <div class="admin-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-family: var(--font-heading); font-size: 1.6rem; color: #fff;">
+          <i class="fa-solid fa-images text-yellow"></i> 2. Carrusel de Anuncios (Debajo de la Presentación)
+        </h3>
+        <button id="add-announcement-btn" class="btn btn-sm btn-yellow"><i class="fa-solid fa-plus"></i> Nuevo Anuncio</button>
+      </div>
+
+      <div id="announcements-editor-list">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- Section 3: Categories & General Status -->
+    <div class="admin-card">
+      <h3 style="font-family: var(--font-heading); font-size: 1.6rem; margin-bottom: 20px; color: #fff;">
+        <i class="fa-solid fa-sliders text-orange"></i> 3. Estado de Tienda y Categorías de Menú
+      </h3>
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label>Control de Estado del Restaurante:</label>
           <div class="status-toggle-group">
             <button class="status-btn" data-status="auto">Automático (Horario)</button>
             <button class="status-btn" data-status="open">Forzar ABIERTO</button>
@@ -198,20 +276,29 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Mensaje del Banner de Anuncios Superior:</label>
-        <input type="text" id="cfg-announcement" class="form-control" placeholder="Ej: ¡Hoy promo 2x1 en Cerveza de Barril!">
+      <!-- Categories Manager -->
+      <div class="form-group mt-4">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <label style="margin-bottom: 0;">Categorías del Menú:</label>
+          <button id="add-category-btn" class="btn btn-sm btn-yellow"><i class="fa-solid fa-plus"></i> Nueva Categoría</button>
+        </div>
+        <div id="categories-editor-list">
+          <!-- Rendered via JS -->
+        </div>
       </div>
-
-      <button id="save-config-btn" class="btn btn-sm btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Ajustes</button>
     </div>
 
-    <!-- Section 2: Menu CRUD -->
+    <!-- Section 4: Product Catalog & Favorites (⭐ Star Toggle) -->
     <div class="admin-card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h3 style="font-family: var(--font-heading); font-size: 1.6rem; color: #fff;">
-          <i class="fa-solid fa-burger text-yellow"></i> 2. Catálogo de Platillos y Precios
-        </h3>
+        <div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.6rem; color: #fff;">
+            <i class="fa-solid fa-burger text-yellow"></i> 4. Catálogo de Productos (Con Favoritos ⭐)
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">
+            Haz clic en la estrellita ⭐ para indicar cuáles platillos aparecen en "Los Favoritos del Garage".
+          </p>
+        </div>
         <button id="add-item-btn" class="btn btn-sm btn-yellow"><i class="fa-solid fa-plus"></i> Nuevo Platillo</button>
       </div>
 
@@ -219,10 +306,11 @@
         <table class="menu-table">
           <thead>
             <tr>
-              <th>Nombre del Platillo</th>
+              <th>Favorito</th>
+              <th>Imagen URL</th>
+              <th>Nombre</th>
               <th>Categoría</th>
               <th>Precio ($ MXN)</th>
-              <th>Insignia</th>
               <th>Disponibilidad</th>
               <th>Acciones</th>
             </tr>
@@ -231,29 +319,6 @@
             <!-- Rendered via JS -->
           </tbody>
         </table>
-      </div>
-    </div>
-
-    <!-- Section 3: Live JSON Exporter & Copy for GitHub -->
-    <div class="admin-card">
-      <h3 style="font-family: var(--font-heading); font-size: 1.6rem; margin-bottom: 16px; color: #fff;">
-        <i class="fa-solid fa-code text-orange"></i> 3. Código JSON Generado (Copiar para GitHub)
-      </h3>
-      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
-        Puedes copiar este código JSON actualizado para reemplazar el contenido de <code>data/menu.json</code> directamente en GitHub.
-      </p>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-        <div>
-          <h4 style="font-size: 0.9rem; color: var(--primary-yellow); margin-bottom: 8px;">data/config.json</h4>
-          <div id="config-json-view" class="json-preview"></div>
-          <button id="copy-cfg-btn" class="btn btn-sm btn-outline mt-4"><i class="fa-solid fa-copy"></i> Copiar config.json</button>
-        </div>
-        <div>
-          <h4 style="font-size: 0.9rem; color: var(--primary-yellow); margin-bottom: 8px;">data/menu.json</h4>
-          <div id="menu-json-view" class="json-preview"></div>
-          <button id="copy-menu-btn" class="btn btn-sm btn-outline mt-4"><i class="fa-solid fa-copy"></i> Copiar menu.json</button>
-        </div>
       </div>
     </div>
 
