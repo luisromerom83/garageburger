@@ -1,7 +1,23 @@
-// Admin Dashboard CMS Logic with Vercel API Integration for GarageBurger
+// Admin Dashboard CMS Logic for GarageBurger
 
 let adminMenu = [];
 let adminConfig = {};
+
+// Popular FontAwesome Icons List for Tag Selection
+const POPULAR_ICONS = [
+  { icon: 'fa-beer-mug-empty', label: '🍺 Cerveza' },
+  { icon: 'fa-drumstick-bite', label: '🍗 Alitas / Boneless' },
+  { icon: 'fa-burger', label: '🍔 Hamburguesa' },
+  { icon: 'fa-award', label: '🏆 Premio / Calidad' },
+  { icon: 'fa-fire-flame-curved', label: '🔥 Picante / Fuego' },
+  { icon: 'fa-star', label: '⭐ Estrella' },
+  { icon: 'fa-pepper-hot', label: '🌶️ Chile / Salsa' },
+  { icon: 'fa-clock', label: '⏰ Horario' },
+  { icon: 'fa-heart', label: '❤️ Favorito' },
+  { icon: 'fa-utensils', label: '🍴 Comida' },
+  { icon: 'fa-tag', label: '🏷️ Oferta' },
+  { icon: 'fa-truck-fast', label: '🚚 Domicilio' }
+];
 
 // DOM Elements
 const loginOverlay = document.getElementById('login-overlay');
@@ -66,7 +82,6 @@ function setupAdminListeners() {
 
   saveAllVercelBtn.addEventListener('click', saveAllToVercelStorage);
 
-  // Status toggle
   statusBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       statusBtns.forEach(b => b.className = 'status-btn');
@@ -76,26 +91,23 @@ function setupAdminListeners() {
     });
   });
 
-  // Feature Tag add
   addFeatureTagBtn.addEventListener('click', () => {
     if (!adminConfig.hero.features) adminConfig.hero.features = [];
     adminConfig.hero.features.push({ icon: 'fa-star', text: 'Nueva Etiqueta' });
     renderHeroFeatures();
   });
 
-  // Announcement slide add
   addAnnouncementBtn.addEventListener('click', () => {
     if (!adminConfig.announcements) adminConfig.announcements = [];
     adminConfig.announcements.push({
       id: `ann-${Date.now()}`,
       title: 'NUEVO ANUNCIO',
-      description: 'Descripción del anuncio o promoción del fin de semana...',
+      description: 'Descripción del anuncio...',
       image: 'assets/Screenshot_20260810_105000.png'
     });
     renderAnnouncementsEditor();
   });
 
-  // Category add
   addCategoryBtn.addEventListener('click', () => {
     if (!adminConfig.categories) adminConfig.categories = [];
     const catName = prompt('Nombre de la nueva categoría (Ej: Postres):');
@@ -106,7 +118,6 @@ function setupAdminListeners() {
     }
   });
 
-  // Product Add
   addItemBtn.addEventListener('click', () => {
     const newItem = {
       id: `item-${Date.now()}`,
@@ -137,7 +148,6 @@ async function loadAdminData() {
       }
     }
 
-    // Fallback static
     const resCfg = await fetch('data/config.json');
     adminConfig = await resCfg.json();
 
@@ -151,7 +161,6 @@ async function loadAdminData() {
 }
 
 function populateAllFields() {
-  // Hero fields
   const hero = adminConfig.hero || {};
   heroTitleInput.value = hero.title || '';
   heroImageInput.value = hero.image || '';
@@ -160,10 +169,8 @@ function populateAllFields() {
   heroBadgeHighlightInput.value = hero.badgeHighlight || '';
   renderHeroFeatures();
 
-  // Announcements
   renderAnnouncementsEditor();
 
-  // Status & WhatsApp
   cfgWa.value = adminConfig.whatsappPhone || '522871270483';
   const st = adminConfig.statusOverride || 'auto';
   statusBtns.forEach(btn => {
@@ -174,10 +181,7 @@ function populateAllFields() {
     }
   });
 
-  // Categories
   renderCategoriesEditor();
-
-  // Products
   renderAdminTable();
 }
 
@@ -185,7 +189,11 @@ function renderHeroFeatures() {
   const features = (adminConfig.hero && adminConfig.hero.features) || [];
   heroFeaturesEditor.innerHTML = features.map((f, i) => `
     <div class="list-item-row">
-      <input type="text" class="form-control" style="width: 140px;" value="${f.icon || 'fa-star'}" placeholder="fa-icon" onchange="updateFeatureTag(${i}, 'icon', this.value)">
+      <select class="form-control" style="width: 180px;" onchange="updateFeatureTag(${i}, 'icon', this.value)">
+        ${POPULAR_ICONS.map(item => `
+          <option value="${item.icon}" ${f.icon === item.icon ? 'selected' : ''}>${item.label}</option>
+        `).join('')}
+      </select>
       <input type="text" class="form-control" value="${f.text}" placeholder="Texto etiqueta" onchange="updateFeatureTag(${i}, 'text', this.value)">
       <button class="btn btn-sm btn-outline" style="color: var(--accent-red);" onclick="deleteFeatureTag(${i})"><i class="fa-solid fa-trash"></i></button>
     </div>
@@ -207,10 +215,14 @@ function renderAnnouncementsEditor() {
     <div style="background: var(--bg-dark); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 16px;">
       <div class="grid grid-2" style="margin-bottom: 10px;">
         <input type="text" class="form-control" value="${ann.title}" placeholder="Título Anuncio" onchange="updateAnnouncement(${i}, 'title', this.value)">
-        <input type="text" class="form-control" value="${ann.image}" placeholder="URL Imagen Anuncio" onchange="updateAnnouncement(${i}, 'image', this.value)">
+        <div>
+          <input type="text" class="form-control" value="${ann.image}" placeholder="Ruta Imagen (Ej: assets/CervezadeBarril.png)" onchange="updateAnnouncement(${i}, 'image', this.value); renderAnnouncementsEditor();">
+          <span class="form-hint">Ej: assets/CervezadeBarril.png</span>
+        </div>
       </div>
       <div style="display: flex; gap: 12px; align-items: center;">
-        <textarea class="form-control" rows="2" placeholder="Descripción del anuncio..." onchange="updateAnnouncement(${i}, 'description', this.value)">${ann.description}</textarea>
+        <img src="${ann.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" onerror="this.src='assets/ilovegarage.png'">
+        <textarea class="form-control" rows="2" placeholder="Descripción..." onchange="updateAnnouncement(${i}, 'description', this.value)">${ann.description}</textarea>
         <button class="btn btn-sm btn-outline" style="color: var(--accent-red); height: 42px;" onclick="deleteAnnouncement(${i})"><i class="fa-solid fa-trash"></i></button>
       </div>
     </div>
@@ -259,7 +271,10 @@ function renderAdminTable() {
         </button>
       </td>
       <td>
-        <input type="text" class="form-control" style="width: 140px;" value="${item.image}" onchange="updateItem(${index}, 'image', this.value)">
+        <img src="${item.image}" class="image-preview-thumbnail" onerror="this.src='assets/ilovegarage.png'">
+      </td>
+      <td>
+        <input type="text" class="form-control" style="width: 180px;" value="${item.image}" placeholder="assets/nombre.png" onchange="updateItem(${index}, 'image', this.value); renderAdminTable();">
       </td>
       <td>
         <input type="text" class="form-control" value="${item.name}" onchange="updateItem(${index}, 'name', this.value)">
@@ -305,9 +320,7 @@ window.deleteItem = function(index) {
   }
 };
 
-// Save All to Vercel Storage via /api/store
 async function saveAllToVercelStorage() {
-  // Sync Hero inputs to adminConfig object
   if (!adminConfig.hero) adminConfig.hero = {};
   adminConfig.hero.title = heroTitleInput.value.trim();
   adminConfig.hero.image = heroImageInput.value.trim();
@@ -334,15 +347,14 @@ async function saveAllToVercelStorage() {
     const result = await response.json();
 
     if (response.ok && result.success) {
-      // Clear local drafts so site always uses live storage API
       localStorage.removeItem('gb_config_draft');
       localStorage.removeItem('gb_menu_draft');
-      alert('¡Excelente! Los cambios se han guardado directamente en Vercel Storage y ya están EN VIVO.');
+      alert('¡Excelente! Los cambios se han guardado exitosamente.');
     } else {
-      alert('Error guardando en Vercel Storage: ' + (result.error || 'Intenta de nuevo.'));
+      alert('Error guardando: ' + (result.error || 'Intenta de nuevo.'));
     }
   } catch (err) {
-    alert('Error al conectar con la API de Vercel Storage: ' + err.message);
+    alert('Error de conexión: ' + err.message);
   } finally {
     saveAllVercelBtn.disabled = false;
     saveAllVercelBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Guardar Cambios en Vivo`;

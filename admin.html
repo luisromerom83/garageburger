@@ -12,7 +12,6 @@
   
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* Admin specific overrides */
     .admin-login-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -59,6 +58,12 @@
       color: var(--text-muted);
       margin-bottom: 8px;
       font-weight: 600;
+    }
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--primary-yellow);
+      margin-top: 4px;
+      display: block;
     }
     .form-control {
       width: 100%;
@@ -129,25 +134,36 @@
       color: var(--primary-yellow);
       text-shadow: 0 0 10px rgba(255, 183, 3, 0.5);
     }
-    
-    .json-preview {
-      background: #050608;
-      border: 1px solid var(--border-color);
-      color: #00ff66;
-      font-family: monospace;
-      padding: 16px;
-      border-radius: var(--radius-sm);
-      height: 200px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      font-size: 0.8rem;
-    }
 
     .list-item-row {
       display: flex;
       gap: 12px;
       align-items: center;
       margin-bottom: 10px;
+    }
+
+    .image-preview-thumbnail {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--border-color);
+      background: #000;
+    }
+
+    .path-helper-box {
+      background: rgba(255, 183, 3, 0.08);
+      border: 1px dashed var(--primary-yellow);
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+      font-size: 0.88rem;
+    }
+    .path-helper-box code {
+      background: rgba(0,0,0,0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--primary-yellow);
     }
   </style>
 </head>
@@ -185,7 +201,7 @@
   <main class="admin-container">
     
     <!-- Quick Actions Banner -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 16px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
       <div>
         <h1 style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--primary-yellow);">GESTOR CMS & STORAGE</h1>
         <p style="color: var(--text-muted);">Administra la presentación, carrusel de anuncios, categorías y favoritos en tiempo real.</p>
@@ -193,6 +209,15 @@
       <div style="display: flex; gap: 12px;">
         <button id="save-all-vercel-btn" class="btn btn-primary btn-lg"><i class="fa-solid fa-cloud-arrow-up"></i> Guardar Cambios en Vivo</button>
       </div>
+    </div>
+
+    <!-- Image Path Guide Banner -->
+    <div class="path-helper-box">
+      <strong><i class="fa-solid fa-circle-info text-yellow"></i> Guía de formato para Imágenes y Rutas:</strong>
+      <ul style="margin-left: 20px; margin-top: 6px; color: var(--text-muted);">
+        <li><strong>Imágenes Locales:</strong> Usa rutas relativas simples como <code>assets/CervezadeBarril.png</code> o <code>assets/logo.png</code> (Asegúrate de respetar mayúsculas/minúsculas).</li>
+        <li><strong>Imágenes de Internet:</strong> Puedes usar cualquier enlace directo como <code>https://images.unsplash.com/...</code></li>
+      </ul>
     </div>
 
     <!-- Section 1: Hero / Presentation Editor -->
@@ -207,8 +232,9 @@
           <input type="text" id="hero-title-input" class="form-control" placeholder="HAMBURGUESAS JUGOSAS & CERVEZA DE BARRIL">
         </div>
         <div class="form-group">
-          <label>URL de Imagen Principal (Costado Derecho):</label>
+          <label>Ruta de Imagen Principal (Costado Derecho):</label>
           <input type="text" id="hero-image-input" class="form-control" placeholder="assets/Screenshot_20260810_105331.png">
+          <span class="form-hint">Ejemplo: assets/Screenshot_20260810_105331.png</span>
         </div>
       </div>
 
@@ -228,10 +254,10 @@
         </div>
       </div>
 
-      <!-- Feature Tags Editor -->
+      <!-- Feature Tags Selector & Editor -->
       <div class="form-group">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <label style="margin-bottom: 0;">Etiquetas Flotantes de la Presentación (Tags):</label>
+          <label style="margin-bottom: 0;">Etiquetas Flotantes con Selector de Iconos:</label>
           <button id="add-feature-tag-btn" class="btn btn-sm btn-yellow"><i class="fa-solid fa-plus"></i> Agregar Tag</button>
         </div>
         <div id="hero-features-editor">
@@ -293,7 +319,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <div>
           <h3 style="font-family: var(--font-heading); font-size: 1.6rem; color: #fff;">
-            <i class="fa-solid fa-burger text-yellow"></i> 4. Catálogo de Productos (Con Favoritos ⭐)
+            <i class="fa-solid fa-burger text-yellow"></i> 4. Catálogo de Productos (Con Vista Previa e Imagen URL)
           </h3>
           <p style="color: var(--text-muted); font-size: 0.85rem;">
             Haz clic en la estrellita ⭐ para indicar cuáles platillos aparecen en "Los Favoritos del Garage".
@@ -307,7 +333,8 @@
           <thead>
             <tr>
               <th>Favorito</th>
-              <th>Imagen URL</th>
+              <th>Vista Previa</th>
+              <th>Ruta de Imagen</th>
               <th>Nombre</th>
               <th>Categoría</th>
               <th>Precio ($ MXN)</th>
