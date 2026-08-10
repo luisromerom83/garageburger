@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garage Burger | Panel de Administración CMS</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Admin specific overrides */
+    .admin-login-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg-dark);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-box {
+      background: var(--bg-card);
+      border: 1px solid var(--primary-orange);
+      padding: 40px;
+      border-radius: var(--radius-lg);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 40px var(--primary-orange-glow);
+    }
+    .admin-nav {
+      background: var(--bg-darker);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 0;
+    }
+    .admin-container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .admin-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .form-control {
+      width: 100%;
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      outline: none;
+    }
+    .form-control:focus {
+      border-color: var(--primary-orange);
+    }
+    .status-toggle-group {
+      display: flex;
+      gap: 12px;
+    }
+    .status-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: var(--bg-dark);
+      color: var(--text-muted);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .status-btn.active.open { background: rgba(46,204,113,0.2); color: var(--accent-green); border-color: var(--accent-green); }
+    .status-btn.active.closed { background: rgba(230,57,70,0.2); color: var(--accent-red); border-color: var(--accent-red); }
+    .status-btn.active.auto { background: rgba(255,183,3,0.2); color: var(--primary-yellow); border-color: var(--primary-yellow); }
+
+    .menu-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    .menu-table th, .menu-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.9rem;
+    }
+    .menu-table th {
+      color: var(--primary-yellow);
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+    }
+    .badge-toggle {
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .badge-toggle.in-stock { background: rgba(46,204,113,0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
+    .badge-toggle.out-stock { background: rgba(230,57,70,0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
+    
+    .json-preview {
+      background: #050608;
+      border: 1px solid var(--border-color);
+      color: #00ff66;
+      font-family: monospace;
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      height: 250px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login Modal -->
+  <div id="login-overlay" class="admin-login-overlay">
+    <div class="login-box">
+      <img src="assets/logo.png" alt="Logo" style="height: 60px; margin: 0 auto 16px; border-radius: 50%;">
+      <h2 style="font-family: var(--font-heading); font-size: 2rem;">ACCESO ADMIN CMS</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Ingresa el PIN de seguridad (Default: 1234)</p>
+      
+      <div class="form-group">
+        <input type="password" id="pin-input" class="form-control" placeholder="****" style="text-align: center; font-size: 1.5rem; letter-spacing: 6px;">
+      </div>
+      <button id="login-btn" class="btn btn-primary btn-block"><i class="fa-solid fa-key"></i> Entrar al CMS</button>
+    </div>
+  </div>
+
+  <!-- Admin Navigation -->
+  <nav class="admin-nav">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <img src="assets/logo.png" alt="Logo" style="height: 40px; border-radius: 50%;">
+        <span style="font-family: var(--font-heading); font-size: 1.5rem; color: #fff;">GARAGE BURGER - ADMIN PANEL</span>
+      </div>
+      <div>
+        <a href="index.html" target="_blank" class="btn btn-sm btn-outline"><i class="fa-solid fa-eye"></i> Ver Sitio Web</a>
+        <button id="logout-btn" class="btn btn-sm btn-outline" style="margin-left: 10px;"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Admin Main Dashboard -->
+  <main class="admin-container">
+    
+    <!-- Quick Actions Banner -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <h1 style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--primary-yellow);">GESTOR DE CONFIGURACIÓN & MENÚ</h1>
+        <p style="color: var(--text-muted);">Edita precios, oculta platillos o cambia el anuncio en vivo sin base de datos.</p>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button id="export-json-btn" class="btn btn-primary"><i class="fa-solid fa-download"></i> Descargar JSONs</button>
+        <button id="reset-draft-btn" class="btn btn-outline"><i class="fa-solid fa-rotate-left"></i> Restablecer Valores</button>
+      </div>
+    </div>
+
+    <!-- Section 1: Store Config -->
+    <div class="admin-card">
+      <h3 style="font-family: var(--font-heading); font-size: 1.6rem; margin-bottom: 20px; color: #fff;">
+        <i class="fa-solid fa-sliders text-orange"></i> 1. Estado y Avisos del Restaurante
+      </h3>
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label>Control Manual de Estado (Abierto / Cerrado):</label>
+          <div class="status-toggle-group">
+            <button class="status-btn" data-status="auto">Automático (Horario)</button>
+            <button class="status-btn" data-status="open">Forzar ABIERTO</button>
+            <button class="status-btn" data-status="closed">Forzar CERRADO</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Teléfono WhatsApp para Pedidos (52...):</label>
+          <input type="text" id="cfg-wa" class="form-control" placeholder="522871270483">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Mensaje del Banner de Anuncios Superior:</label>
+        <input type="text" id="cfg-announcement" class="form-control" placeholder="Ej: ¡Hoy promo 2x1 en Cerveza de Barril!">
+      </div>
+
+      <button id="save-config-btn" class="btn btn-sm btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Ajustes</button>
+    </div>
+
+    <!-- Section 2: Menu CRUD -->
+    <div class="admin-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-family: var(--font-heading); font-size: 1.6rem; color: #fff;">
+          <i class="fa-solid fa-burger text-yellow"></i> 2. Catálogo de Platillos y Precios
+        </h3>
+        <button id="add-item-btn" class="btn btn-sm btn-yellow"><i class="fa-solid fa-plus"></i> Nuevo Platillo</button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="menu-table">
+          <thead>
+            <tr>
+              <th>Nombre del Platillo</th>
+              <th>Categoría</th>
+              <th>Precio ($ MXN)</th>
+              <th>Insignia</th>
+              <th>Disponibilidad</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="admin-menu-rows">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 3: Live JSON Exporter & Copy for GitHub -->
+    <div class="admin-card">
+      <h3 style="font-family: var(--font-heading); font-size: 1.6rem; margin-bottom: 16px; color: #fff;">
+        <i class="fa-solid fa-code text-orange"></i> 3. Código JSON Generado (Copiar para GitHub)
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+        Puedes copiar este código JSON actualizado para reemplazar el contenido de <code>data/menu.json</code> directamente en GitHub.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <h4 style="font-size: 0.9rem; color: var(--primary-yellow); margin-bottom: 8px;">data/config.json</h4>
+          <div id="config-json-view" class="json-preview"></div>
+          <button id="copy-cfg-btn" class="btn btn-sm btn-outline mt-4"><i class="fa-solid fa-copy"></i> Copiar config.json</button>
+        </div>
+        <div>
+          <h4 style="font-size: 0.9rem; color: var(--primary-yellow); margin-bottom: 8px;">data/menu.json</h4>
+          <div id="menu-json-view" class="json-preview"></div>
+          <button id="copy-menu-btn" class="btn btn-sm btn-outline mt-4"><i class="fa-solid fa-copy"></i> Copiar menu.json</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>

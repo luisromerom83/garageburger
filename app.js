@@ -1,216 +1,7 @@
-// GarageBurger Interactive Application Logic
+// GarageBurger Dynamic Application Logic (JSON CMS Driven)
 
-const MENU_ITEMS = [
-  // Hamburguesas & Especiales
-  {
-    id: 'pulled-pork',
-    name: 'Pulled Pork & Brioche',
-    category: 'hamburguesas',
-    price: 160,
-    description: 'Jugosa carne de cerdo desmenuzada marinada en salsa BBQ especial con ensalada de col dulce en pan Brioche.',
-    image: 'assets/pulledpork.png',
-    badge: 'Especial de la Casa'
-  },
-  {
-    id: 'costillas-bbq',
-    name: 'Costillas BBQ Especial',
-    category: 'hamburguesas',
-    price: 220,
-    description: 'Costillas de cerdo ahumadas bañadas en BBQ, puré de papa con gravy, Mac and Cheese o ensalada de col.',
-    image: 'assets/Screenshot_20260810_105000.png',
-    badge: 'Estrella'
-  },
-  {
-    id: 'garage-burger-double',
-    name: 'Doble Garage Burger',
-    category: 'hamburguesas',
-    price: 180,
-    description: 'Doble carne de res sazonada, queso gouda fundido, tocino crujiente, cebolla caramelizada y aderezo especial.',
-    image: 'assets/Screenshot_20260810_105331.png',
-    badge: 'Popular'
-  },
-  {
-    id: 'garage-burger-classic',
-    name: 'Clásica Garage Burger',
-    category: 'hamburguesas',
-    price: 120,
-    description: '100% carne de res jugosa, queso amarillo, lechuga fresca, jitomate y aderezo Garage.',
-    image: 'assets/Screenshot_20260810_105350.png',
-    badge: ''
-  },
-
-  // Boneless & Snacks
-  {
-    id: 'boneless-150',
-    name: 'Boneless Bañados o Naturales',
-    category: 'boneless',
-    price: 150,
-    description: 'Trozos de pechuga crujientes bañados en tu salsa favorita, acompañados de aderezo ranch, papas o aros de cebolla.',
-    image: 'assets/Boneless.png',
-    badge: 'Recomendado'
-  },
-  {
-    id: 'bolitas-queso',
-    name: 'Bolitas de Queso Gouda',
-    category: 'boneless',
-    price: 70,
-    description: 'Queso gouda sazonado y empanizado crujiente. 8 piezas acompañadas de dip.',
-    image: 'assets/Screenshot_20260810_105331.png',
-    badge: 'Snack'
-  },
-  {
-    id: 'aros-cebolla',
-    name: 'Aros de Cebolla Crujientes',
-    category: 'boneless',
-    price: 65,
-    description: 'Aros de cebolla dorados y sazonados con especias secretas.',
-    image: 'assets/Screenshot_20260810_105331.png',
-    badge: 'Crujiente'
-  },
-
-  // Cervezas & Bebidas
-  {
-    id: 'cerveza-barril',
-    name: 'Cerveza de Barril Helada',
-    category: 'bebidas',
-    price: 50,
-    description: 'Tarro helado de cerveza de barril de la casa.',
-    image: 'assets/CervezadeBarril.png',
-    badge: 'Favorito'
-  },
-  {
-    id: 'cerveza-cuartito',
-    name: 'Cerveza Cuartito',
-    category: 'bebidas',
-    price: 25,
-    description: 'Presentación cuartito bien fría.',
-    image: 'assets/CervezadeBarril.png',
-    badge: ''
-  },
-  {
-    id: 'cerveza-media',
-    name: 'Cerveza Media',
-    category: 'bebidas',
-    price: 30,
-    description: 'Presentación media bien fría.',
-    image: 'assets/CervezadeBarril.png',
-    badge: ''
-  },
-  {
-    id: 'cerveza-raiz',
-    name: 'Cerveza de Raíz',
-    category: 'bebidas',
-    price: 70,
-    description: 'Refrescante cerveza de raíz artesanal.',
-    image: 'assets/CervezadeBarril.png',
-    badge: ''
-  },
-  {
-    id: 'cerveza-flotante',
-    name: 'Cerveza de Raíz con Flotante',
-    category: 'bebidas',
-    price: 100,
-    description: 'Cerveza de raíz con bola de nieve de vainilla cremosa.',
-    image: 'assets/CervezadeBarril.png',
-    badge: 'Especial'
-  },
-  {
-    id: 'refresco',
-    name: 'Refresco de Lata',
-    category: 'bebidas',
-    price: 25,
-    description: 'Variedad de sabores bien fríos.',
-    image: 'assets/CervezadeBarril.png',
-    badge: ''
-  },
-  {
-    id: 'agua-natural',
-    name: 'Agua Natural Botella',
-    category: 'bebidas',
-    price: 15,
-    description: 'Botella de agua purificada 600ml.',
-    image: 'assets/CervezadeBarril.png',
-    badge: ''
-  },
-
-  // Salsas
-  {
-    id: 'salsa-crema-habanero',
-    name: 'Salsa Crema de Habanero',
-    category: 'salsas',
-    price: 15,
-    description: 'Cremosa y picante, hecha en casa.',
-    image: 'assets/menu.jpg',
-    badge: 'Artesanal'
-  },
-  {
-    id: 'salsa-pina-habanero',
-    name: 'Salsa Piña Habanero',
-    category: 'salsas',
-    price: 15,
-    description: 'Toque dulce de piña caramelizada con picor de habanero.',
-    image: 'assets/menu.jpg',
-    badge: 'Top'
-  },
-  {
-    id: 'salsa-mango-habanero',
-    name: 'Salsa Mango Habanero',
-    category: 'salsas',
-    price: 15,
-    description: 'Sabor frutal intenso con verdadero habanero.',
-    image: 'assets/menu.jpg',
-    badge: 'Top'
-  },
-  {
-    id: 'salsa-bbq-chipotle',
-    name: 'Salsa BBQ Chipotle',
-    category: 'salsas',
-    price: 15,
-    description: 'Ahuma perfecto con el toque ahumado del chipotle.',
-    image: 'assets/menu.jpg',
-    badge: ''
-  },
-
-  // Extras
-  {
-    id: 'extra-queso',
-    name: 'Extra Queso Amarillo',
-    category: 'extras',
-    price: 15,
-    description: 'Porción extra de queso fundido.',
-    image: 'assets/menu.jpg',
-    badge: ''
-  },
-  {
-    id: 'extra-ranch',
-    name: 'Aderezo Ranch',
-    category: 'extras',
-    price: 25,
-    description: 'Porción de aderezo ranch cremoso.',
-    image: 'assets/menu.jpg',
-    badge: ''
-  },
-  {
-    id: 'extra-aderezo-burger',
-    name: 'Aderezo Burger',
-    category: 'extras',
-    price: 35,
-    description: 'Aderezo secreto de la casa Garage.',
-    image: 'assets/menu.jpg',
-    badge: 'Secreto'
-  },
-  {
-    id: 'extra-ensalada-col',
-    name: 'Ensalada de Col Dulce',
-    category: 'extras',
-    price: 25,
-    description: 'Porción individual de cole slaw dulce y crujiente.',
-    image: 'assets/menu.jpg',
-    badge: ''
-  }
-];
-
-// State
+let MENU_ITEMS = [];
+let STORE_CONFIG = {};
 let cart = [];
 
 // DOM Elements
@@ -229,12 +20,83 @@ const checkoutWaBtn = document.getElementById('checkout-wa-btn');
 const statusBadge = document.getElementById('status-badge');
 const statusText = document.getElementById('status-text');
 
-// Initialize Application
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize Application with JSON Fetch
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadStoreData();
+  applyStoreConfig();
   renderMenu(MENU_ITEMS);
-  checkOperatingStatus();
   setupEventListeners();
 });
+
+// Load Config & Menu from JSON or LocalStorage Draft Override
+async function loadStoreData() {
+  try {
+    // 1. Config
+    const draftCfg = localStorage.getItem('gb_config_draft');
+    if (draftCfg) {
+      STORE_CONFIG = JSON.parse(draftCfg);
+    } else {
+      const resCfg = await fetch('data/config.json');
+      STORE_CONFIG = await resCfg.json();
+    }
+
+    // 2. Menu
+    const draftMenu = localStorage.getItem('gb_menu_draft');
+    if (draftMenu) {
+      MENU_ITEMS = JSON.parse(draftMenu);
+    } else {
+      const resMenu = await fetch('data/menu.json');
+      MENU_ITEMS = await resMenu.json();
+    }
+  } catch (err) {
+    console.error('Error al cargar datos JSON:', err);
+  }
+}
+
+// Apply Store Config (Banner, Status, WhatsApp Number)
+function applyStoreConfig() {
+  // Banner
+  const announcementEl = document.querySelector('.announcement-content .schedule-info');
+  if (announcementEl && STORE_CONFIG.announcementText) {
+    announcementEl.innerHTML = `<i class="fa-solid fa-bullhorn"></i> ${STORE_CONFIG.announcementText}`;
+  }
+
+  // Operating status
+  checkOperatingStatus();
+}
+
+// Check Operating Hours & Override Logic
+function checkOperatingStatus() {
+  const override = STORE_CONFIG.statusOverride || 'auto';
+
+  if (override === 'open') {
+    statusBadge.className = 'badge-status open';
+    statusText.textContent = 'ABIERTO AHORA (FORZADO)';
+    return;
+  }
+
+  if (override === 'closed') {
+    statusBadge.className = 'badge-status closed';
+    statusText.textContent = 'CERRADO (POR EL MOMENTO)';
+    return;
+  }
+
+  // Automatic Day & Hour Check
+  const now = new Date();
+  const day = now.getDay(); // 0 = Domingo, 4 = Jueves, 5 = Viernes, 6 = Sábado
+  const hour = now.getHours();
+
+  const isOperatingDay = [0, 4, 5, 6].includes(day);
+  const isOperatingHour = hour >= 19 && hour < 23;
+
+  if (isOperatingDay && isOperatingHour) {
+    statusBadge.className = 'badge-status open';
+    statusText.textContent = 'ABIERTO AHORA';
+  } else {
+    statusBadge.className = 'badge-status closed';
+    statusText.textContent = 'CERRADO (Abrimos Jue-Dom 7PM)';
+  }
+}
 
 // Render Menu Cards
 function renderMenu(items) {
@@ -248,24 +110,32 @@ function renderMenu(items) {
     return;
   }
 
-  menuGrid.innerHTML = items.map(item => `
-    <div class="card" data-category="${item.category}">
-      <div class="card-img-wrap">
-        <img src="${item.image}" alt="${item.name}" onerror="this.src='assets/ilovegarage.png'">
-        ${item.badge ? `<span class="card-badge">${item.badge}</span>` : ''}
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">${item.name}</h3>
-        <p class="card-text">${item.description}</p>
-        <div class="card-footer">
-          <span class="price">$${item.price} MXN</span>
-          <button class="btn btn-sm btn-outline add-to-cart-btn" data-id="${item.id}">
-            <i class="fa-solid fa-plus"></i> Agregar
-          </button>
+  menuGrid.innerHTML = items.map(item => {
+    const isAvailable = item.available !== false;
+    return `
+      <div class="card ${!isAvailable ? 'unavailable-card' : ''}" data-category="${item.category}" style="${!isAvailable ? 'opacity: 0.55; filter: grayscale(0.6);' : ''}">
+        <div class="card-img-wrap">
+          <img src="${item.image}" alt="${item.name}" onerror="this.src='assets/ilovegarage.png'">
+          ${item.badge ? `<span class="card-badge">${item.badge}</span>` : ''}
+          ${!isAvailable ? `<span class="card-badge badge-red" style="left: 12px; right: auto;">AGOTADO</span>` : ''}
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">${item.name}</h3>
+          <p class="card-text">${item.description}</p>
+          <div class="card-footer">
+            <span class="price">$${item.price} MXN</span>
+            ${isAvailable ? `
+              <button class="btn btn-sm btn-outline add-to-cart-btn" data-id="${item.id}">
+                <i class="fa-solid fa-plus"></i> Agregar
+              </button>
+            ` : `
+              <span style="font-size: 0.85rem; color: var(--accent-red); font-weight: 700;">No Disponible</span>
+            `}
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   // Re-attach add to cart click listeners
   document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
@@ -278,26 +148,22 @@ function renderMenu(items) {
 
 // Filter and Search Logic
 function setupEventListeners() {
-  // Filter Tabs
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const cat = btn.getAttribute('data-category');
-      
       const query = searchInput.value.toLowerCase().trim();
       filterMenu(cat, query);
     });
   });
 
-  // Search Input
   searchInput.addEventListener('input', (e) => {
     const activeTab = document.querySelector('.filter-btn.active').getAttribute('data-category');
     const query = e.target.value.toLowerCase().trim();
     filterMenu(activeTab, query);
   });
 
-  // Direct add buttons on static elements
   document.querySelectorAll('.add-to-cart-direct').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const id = e.currentTarget.getAttribute('data-id');
@@ -306,12 +172,10 @@ function setupEventListeners() {
     });
   });
 
-  // Cart Drawer open/close
   cartBtn.addEventListener('click', openCartDrawer);
   closeDrawerBtn.addEventListener('click', closeCartDrawer);
   drawerOverlay.addEventListener('click', closeCartDrawer);
 
-  // WhatsApp Checkout
   checkoutWaBtn.addEventListener('click', sendWhatsAppOrder);
 }
 
@@ -332,10 +196,10 @@ function filterMenu(category, query) {
   renderMenu(filtered);
 }
 
-// Cart State Management
+// Cart Management
 function addToCart(itemId) {
   const item = MENU_ITEMS.find(i => i.id === itemId);
-  if (!item) return;
+  if (!item || item.available === false) return;
 
   const existingIndex = cart.findIndex(ci => ci.id === itemId);
 
@@ -347,12 +211,11 @@ function addToCart(itemId) {
 
   updateCartUI();
 
-  // Highlight cart button animation
   cartBtn.style.transform = 'scale(1.1)';
   setTimeout(() => cartBtn.style.transform = 'scale(1)', 200);
 }
 
-function updateCartQty(itemId, delta) {
+window.updateCartQty = function(itemId, delta) {
   const index = cart.findIndex(ci => ci.id === itemId);
   if (index === -1) return;
 
@@ -363,7 +226,7 @@ function updateCartQty(itemId, delta) {
   }
 
   updateCartUI();
-}
+};
 
 function updateCartUI() {
   const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
@@ -432,28 +295,9 @@ function sendWhatsAppOrder() {
 
   message += `\n¡Hola! Quisiera realizar este pedido. Por favor me confirman el tiempo estimado y lugar de entrega/recogida.`;
 
-  const phone = '522871270483';
+  const phone = STORE_CONFIG.whatsappPhone || '522871270483';
   const encodedMsg = encodeURIComponent(message);
   const waUrl = `https://wa.me/${phone}?text=${encodedMsg}`;
 
   window.open(waUrl, '_blank');
-}
-
-// Check Operating Hours Logic (Jueves a Domingo 7:00 PM a 11:00 PM)
-function checkOperatingStatus() {
-  const now = new Date();
-  const day = now.getDay(); // 0 = Domingo, 4 = Jueves, 5 = Viernes, 6 = Sábado
-  const hour = now.getHours();
-
-  // Jueves(4), Viernes(5), Sábado(6), Domingo(0) entre 19h (7PM) y 23h (11PM)
-  const isOperatingDay = [0, 4, 5, 6].includes(day);
-  const isOperatingHour = hour >= 19 && hour < 23;
-
-  if (isOperatingDay && isOperatingHour) {
-    statusBadge.className = 'badge-status open';
-    statusText.textContent = 'ABIERTO AHORA';
-  } else {
-    statusBadge.className = 'badge-status closed';
-    statusText.textContent = 'CERRADO (Abrimos Jue-Dom 7PM)';
-  }
 }
