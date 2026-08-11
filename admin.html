@@ -145,6 +145,13 @@
       background: #000;
     }
 
+    /* Upload & Explorer Buttons Group */
+    .image-controls-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
     /* Modal Image Picker / Explorer */
     .image-picker-modal {
       position: fixed;
@@ -217,6 +224,9 @@
 </head>
 <body>
 
+  <!-- Hidden global file input for image uploads -->
+  <input type="file" id="global-file-input" accept="image/*" style="display: none;">
+
   <!-- Login Modal -->
   <div id="login-overlay" class="admin-login-overlay">
     <div class="login-box">
@@ -251,8 +261,8 @@
     <!-- Quick Actions Banner -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
       <div>
-        <h1 style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--primary-yellow);">GESTOR CMS & EXPLORADOR DE IMÁGENES</h1>
-        <p style="color: var(--text-muted);">Selecciona imágenes directamente del explorador de la carpeta <code>assets/</code>.</p>
+        <h1 style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--primary-yellow);">GESTOR CMS & CARGADOR DE IMÁGENES</h1>
+        <p style="color: var(--text-muted);">Sube fotos directamente desde tu celular/computadora o elije de la galería.</p>
       </div>
       <div style="display: flex; gap: 12px;">
         <button id="save-all-vercel-btn" class="btn btn-primary btn-lg"><i class="fa-solid fa-cloud-arrow-up"></i> Guardar Cambios en Vivo</button>
@@ -272,9 +282,10 @@
         </div>
         <div class="form-group">
           <label>Imagen Principal (Costado Derecho):</label>
-          <div style="display: flex; gap: 10px;">
+          <div class="image-controls-group">
             <input type="text" id="hero-image-input" class="form-control" placeholder="assets/Screenshot_20260810_105331.png">
-            <button class="btn btn-sm btn-outline open-explorer-btn" data-target="hero-image-input"><i class="fa-regular fa-folder-open"></i> Explorar</button>
+            <button class="btn btn-sm btn-yellow upload-trigger-btn" data-target="hero-image-input"><i class="fa-solid fa-upload"></i> Subir</button>
+            <button class="btn btn-sm btn-outline open-explorer-btn" data-target="hero-image-input"><i class="fa-regular fa-folder-open"></i> Galería</button>
           </div>
         </div>
       </div>
@@ -360,10 +371,10 @@
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <div>
           <h3 style="font-family: var(--font-heading); font-size: 1.6rem; color: #fff;">
-            <i class="fa-solid fa-burger text-yellow"></i> 4. Catálogo de Productos (Con Explorador e Imágenes Seleccionables)
+            <i class="fa-solid fa-burger text-yellow"></i> 4. Catálogo de Productos (Con Botón de Subir Foto)
           </h3>
           <p style="color: var(--text-muted); font-size: 0.85rem;">
-            Haz clic en la estrellita ⭐ para indicar cuáles platillos aparecen en "Los Favoritos del Garage".
+            Haz clic en <strong><i class="fa-solid fa-upload"></i> Subir</strong> para tomar una foto con tu cámara o seleccionar desde tu celular.
           </p>
         </div>
         <button id="add-item-btn" class="btn btn-sm btn-yellow"><i class="fa-solid fa-plus"></i> Nuevo Platillo</button>
@@ -375,7 +386,7 @@
             <tr>
               <th>Favorito</th>
               <th>Vista Previa</th>
-              <th>Seleccionar Imagen</th>
+              <th>Imagen URL / Subir</th>
               <th>Nombre</th>
               <th>Categoría</th>
               <th>Precio ($ MXN)</th>
@@ -396,7 +407,7 @@
   <div id="image-picker-modal" class="image-picker-modal">
     <div class="picker-box">
       <div class="picker-header">
-        <h3><i class="fa-regular fa-folder-open text-orange"></i> Explorador de Imágenes (Carpeta <code>assets/</code>)</h3>
+        <h3><i class="fa-regular fa-folder-open text-orange"></i> Galería de Imágenes</h3>
         <button id="close-picker-btn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="picker-body" id="picker-gallery">

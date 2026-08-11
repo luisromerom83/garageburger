@@ -1,9 +1,10 @@
-// Admin Dashboard CMS Logic for GarageBurger with Asset Explorer
+// Admin Dashboard CMS Logic for GarageBurger with Direct Image Upload & Supabase Storage
 
 let adminMenu = [];
 let adminConfig = {};
 let availableAssets = [];
 let activePickerCallback = null;
+let activeUploadCallback = null;
 
 // Popular FontAwesome Icons List for Tag Selection
 const POPULAR_ICONS = [
@@ -27,6 +28,7 @@ const pinInput = document.getElementById('pin-input');
 const loginBtn = document.getElementById('login-btn');
 const logoutBtn = document.getElementById('logout-btn');
 const saveAllVercelBtn = document.getElementById('save-all-vercel-btn');
+const globalFileInput = document.getElementById('global-file-input');
 
 // Hero Inputs
 const heroTitleInput = document.getElementById('hero-title-input');
@@ -141,7 +143,16 @@ function setupAdminListeners() {
     renderAdminTable();
   });
 
-  // Hero Explorer Button
+  // Hero Upload & Explorer Buttons
+  document.querySelectorAll('.upload-trigger-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const targetId = e.currentTarget.getAttribute('data-target');
+      triggerFileUpload((uploadedUrl) => {
+        document.getElementById(targetId).value = uploadedUrl;
+      });
+    });
+  });
+
   document.querySelectorAll('.open-explorer-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const targetId = e.currentTarget.getAttribute('data-target');
@@ -152,6 +163,50 @@ function setupAdminListeners() {
   });
 
   closePickerBtn.addEventListener('click', closeImagePicker);
+
+  // Global File Input Change Handler
+  globalFileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result;
+      
+      try {
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageBase64: base64,
+            fileName: file.name,
+            fileType: file.type
+          })
+        });
+
+        const data = await response.json();
+        if (response.ok && data.url) {
+          if (activeUploadCallback) {
+            activeUploadCallback(data.url);
+          }
+          alert('¡Imagen subida con éxito!');
+        } else {
+          alert('Error al subir imagen: ' + (data.error || 'Intenta de nuevo'));
+        }
+      } catch (err) {
+        alert('Error de conexión subiendo imagen: ' + err.message);
+      } finally {
+        globalFileInput.value = '';
+        activeUploadCallback = null;
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function triggerFileUpload(onSuccessCallback) {
+  activeUploadCallback = onSuccessCallback;
+  globalFileInput.click();
 }
 
 async function loadAdminData() {
@@ -274,10 +329,8 @@ function renderAnnouncementsEditor() {
       <div class="grid grid-2" style="margin-bottom: 10px;">
         <input type="text" class="form-control" value="${ann.title}" placeholder="Título Anuncio" onchange="updateAnnouncement(${i}, 'title', this.value)">
         <div style="display: flex; gap: 8px;">
-          <select class="form-control" onchange="updateAnnouncement(${i}, 'image', this.value); renderAnnouncementsEditor();">
-            <option value="${ann.image}">Actual: ${ann.image}</option>
-            ${availableAssets.map(a => `<option value="${a.path}">${a.filename}</option>`).join('')}
-          </select>
+          <input type="text" class="form-control" value="${ann.image}" placeholder="Ruta o URL Imagen" onchange="updateAnnouncement(${i}, 'image', this.value); renderAnnouncementsEditor();">
+          <button class="btn btn-sm btn-yellow" onclick="uploadForAnnouncement(${i})"><i class="fa-solid fa-upload"></i> Subir</button>
           <button class="btn btn-sm btn-outline" onclick="openPickerForAnnouncement(${i})"><i class="fa-regular fa-folder-open"></i></button>
         </div>
       </div>
@@ -289,6 +342,13 @@ function renderAnnouncementsEditor() {
     </div>
   `).join('');
 }
+
+window.uploadForAnnouncement = function(index) {
+  triggerFileUpload((uploadedUrl) => {
+    adminConfig.announcements[index].image = uploadedUrl;
+    renderAnnouncementsEditor();
+  });
+};
 
 window.openPickerForAnnouncement = function(index) {
   openImagePicker((selectedPath) => {
@@ -342,11 +402,9 @@ function renderAdminTable() {
         <img src="${item.image}" class="image-preview-thumbnail" onerror="this.src='assets/ilovegarage.png'">
       </td>
       <td>
-        <div style="display: flex; gap: 6px; min-width: 220px;">
-          <select class="form-control" style="font-size: 0.85rem;" onchange="updateItem(${index}, 'image', this.value); renderAdminTable();">
-            <option value="${item.image}">${item.image.replace('assets/', '')}</option>
-            ${availableAssets.map(a => `<option value="${a.path}">${a.filename}</option>`).join('')}
-          </select>
+        <div style="display: flex; gap: 6px; min-width: 260px;">
+          <input type="text" class="form-control" style="font-size: 0.85rem;" value="${item.image}" onchange="updateItem(${index}, 'image', this.value); renderAdminTable();">
+          <button class="btn btn-sm btn-yellow" onclick="uploadForProduct(${index})"><i class="fa-solid fa-upload"></i> Subir</button>
           <button class="btn btn-sm btn-outline" onclick="openPickerForProduct(${index})"><i class="fa-regular fa-folder-open"></i></button>
         </div>
       </td>
@@ -372,6 +430,13 @@ function renderAdminTable() {
     </tr>
   `).join('');
 }
+
+window.uploadForProduct = function(index) {
+  triggerFileUpload((uploadedUrl) => {
+    adminMenu[index].image = uploadedUrl;
+    renderAdminTable();
+  });
+};
 
 window.openPickerForProduct = function(index) {
   openImagePicker((selectedPath) => {

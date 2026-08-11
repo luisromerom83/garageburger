@@ -1,5 +1,4 @@
--- Supabase SQL Schema for GarageBurger
--- Execute this script in your Supabase SQL Editor (https://supabase.com/dashboard/project/_/sql)
+-- Supabase SQL Schema for GarageBurger (Tables + Storage Bucket)
 
 -- 1. Table for Store Configuration & Hero / Announcements
 CREATE TABLE IF NOT EXISTS public.garage_config (
@@ -22,7 +21,16 @@ CREATE TABLE IF NOT EXISTS public.garage_menu (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Turn on Row Level Security (RLS) and allow public read access
+-- 3. Storage Bucket Creation for Images
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('garage_assets', 'garage_assets', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Policies for public read & upload
+CREATE POLICY "Public Read Assets" ON storage.objects FOR SELECT USING (bucket_id = 'garage_assets');
+CREATE POLICY "Public Upload Assets" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'garage_assets');
+
+-- RLS for Tables
 ALTER TABLE public.garage_config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.garage_menu ENABLE ROW LEVEL SECURITY;
 
