@@ -62,19 +62,33 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
+  <!-- Hero Section Layout matching User Reference Image -->
   <header class="hero">
     <div class="container hero-grid">
+      
+      <!-- Left Column: Title, Badge, Description, CTAs -->
       <div class="hero-content">
+        <h1 id="hero-title" class="hero-title">HAMBURGUESAS JUGOSAS & CERVEZA BARRIL</h1>
+        
         <div class="badge-tag">
           <i class="fa-solid fa-fire"></i> <span id="hero-badge-label">Sabor Legendario</span> • <span id="hero-badge-highlight" class="text-yellow">¡Te vas a antojar!</span>
         </div>
         
-        <h1 id="hero-title" class="hero-title">HAMBURGUESAS JUGOSAS & CERVEZA DE BARRIL</h1>
-        
         <p id="hero-description" class="hero-description">
           Disfruta de nuestras costillas BBQ ahumadas, Pulled Pork suave con ensalada de col en pan brioche, Boneless bañados en salsas habanero y aros de cebolla crujientes.
         </p>
+
+        <div class="hero-cta-group">
+          <a href="#menu" class="btn btn-primary btn-lg"><i class="fa-solid fa-utensils"></i> Explorar Menú</a>
+          <a href="https://wa.me/522871270483" id="hero-wa-btn" target="_blank" class="btn btn-whatsapp btn-lg"><i class="fa-brands fa-whatsapp"></i> Pedir por WhatsApp</a>
+        </div>
+      </div>
+
+      <!-- Right Column: Card Photo + Feature Tags underneath -->
+      <div class="hero-visual">
+        <div class="hero-img-card">
+          <img id="hero-img" src="assets/Screenshot_20260810_105331.png" alt="Hamburguesa Especial Garage Burger" onerror="handleImageError(this)">
+        </div>
 
         <div class="hero-features" id="hero-features-list">
           <div class="feature-item">
@@ -90,19 +104,8 @@
             <span>Pan Brioche Artesanal</span>
           </div>
         </div>
-
-        <div class="hero-cta-group">
-          <a href="#menu" class="btn btn-primary btn-lg"><i class="fa-solid fa-utensils"></i> Explorar Menú</a>
-          <a href="https://wa.me/522871270483" id="hero-wa-btn" target="_blank" class="btn btn-whatsapp btn-lg"><i class="fa-brands fa-whatsapp"></i> Pedir por WhatsApp</a>
-        </div>
       </div>
 
-      <div class="hero-visual">
-        <div class="hero-img-card">
-          <img id="hero-img" src="assets/Screenshot_20260810_105331.png" alt="Hamburguesa Especial Garage Burger" onerror="handleImageError(this)">
-          <div class="visual-glow"></div>
-        </div>
-      </div>
     </div>
   </header>
 
