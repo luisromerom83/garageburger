@@ -284,14 +284,19 @@ function populateAllFields() {
   const openHrSelect = document.getElementById('cfg-open-hour');
   const closeHrSelect = document.getElementById('cfg-close-hour');
   if (openHrSelect) openHrSelect.value = adminConfig.openHour !== undefined ? adminConfig.openHour : 19;
-  if (closeHrSelect) closeHrSelect.value = adminConfig.closeHour !== undefined ? adminConfig.closeHour : 23;
+  const phone1El = document.getElementById('cfg-wa');
+  const phone2El = document.getElementById('cfg-phone2');
+  const igEl = document.getElementById('cfg-ig');
+  const fbEl = document.getElementById('cfg-fb');
+  const addrEl = document.getElementById('cfg-address');
+  const mapsEl = document.getElementById('cfg-maps');
 
-  if (cfgWa) cfgWa.value = adminConfig.whatsappPhone || '522871270483';
-  if (cfgPhone2) cfgPhone2.value = adminConfig.secondaryPhone || '';
-  if (cfgIg) cfgIg.value = adminConfig.instagramUser || '';
-  if (cfgFb) cfgFb.value = adminConfig.facebookUrl || '';
-  if (cfgAddress) cfgAddress.value = adminConfig.addressText || '';
-  if (cfgMaps) cfgMaps.value = adminConfig.mapsUrl || '';
+  if (phone1El) phone1El.value = adminConfig.whatsappPhone || '522871270483';
+  if (phone2El) phone2El.value = adminConfig.secondaryPhone || '287 121 2221';
+  if (igEl) igEl.value = adminConfig.instagramUser || 'GARAGE_BURGER_19';
+  if (fbEl) fbEl.value = adminConfig.facebookUrl || 'https://facebook.com/garageburgertuxtepec';
+  if (addrEl) addrEl.value = adminConfig.addressText || 'Av. Independencia #123, Col. Centro, Tuxtepec, Oax.';
+  if (mapsEl) mapsEl.value = adminConfig.mapsUrl || 'https://maps.google.com/?q=Garage+Burger';
 
   const st = adminConfig.statusOverride || 'auto';
   statusBtns.forEach(btn => {
@@ -538,12 +543,19 @@ async function saveAllToVercelStorage() {
   if (openHrSelect) adminConfig.openHour = parseInt(openHrSelect.value, 10);
   if (closeHrSelect) adminConfig.closeHour = parseInt(closeHrSelect.value, 10);
 
-  if (cfgWa) adminConfig.whatsappPhone = cfgWa.value.trim();
-  if (cfgPhone2) adminConfig.secondaryPhone = cfgPhone2.value.trim();
-  if (cfgIg) adminConfig.instagramUser = cfgIg.value.trim();
-  if (cfgFb) adminConfig.facebookUrl = cfgFb.value.trim();
-  if (cfgAddress) adminConfig.addressText = cfgAddress.value.trim();
-  if (cfgMaps) adminConfig.mapsUrl = cfgMaps.value.trim();
+  const phone1El = document.getElementById('cfg-wa');
+  const phone2El = document.getElementById('cfg-phone2');
+  const igEl = document.getElementById('cfg-ig');
+  const fbEl = document.getElementById('cfg-fb');
+  const addrEl = document.getElementById('cfg-address');
+  const mapsEl = document.getElementById('cfg-maps');
+
+  if (phone1El) adminConfig.whatsappPhone = phone1El.value.trim();
+  if (phone2El) adminConfig.secondaryPhone = phone2El.value.trim();
+  if (igEl) adminConfig.instagramUser = igEl.value.trim();
+  if (fbEl) adminConfig.facebookUrl = fbEl.value.trim();
+  if (addrEl) adminConfig.addressText = addrEl.value.trim();
+  if (mapsEl) adminConfig.mapsUrl = mapsEl.value.trim();
 
   // 1. Immediate Instant Persistence in LocalStorage
   localStorage.setItem('gb_live_config', JSON.stringify(adminConfig));
