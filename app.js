@@ -105,14 +105,27 @@ function applyStoreConfig() {
   if (STORE_CONFIG.scheduleText) {
     document.getElementById('schedule-text-info').textContent = STORE_CONFIG.scheduleText;
   }
-  if (STORE_CONFIG.secondaryPhone || STORE_CONFIG.whatsappPhone) {
-    document.getElementById('phones-text-info').textContent = `${STORE_CONFIG.secondaryPhone || ''} / ${STORE_CONFIG.whatsappPhone || ''}`;
-  }
+
+  const phone2Text = STORE_CONFIG.secondaryPhone ? ` / ${STORE_CONFIG.secondaryPhone}` : '';
+  document.getElementById('phones-text-info').textContent = `${phone}${phone2Text}`;
+
   if (STORE_CONFIG.instagramUser) {
-    const igUrl = `https://instagram.com/${STORE_CONFIG.instagramUser}`;
+    const igUrl = `https://instagram.com/${STORE_CONFIG.instagramUser.replace('@', '')}`;
     document.getElementById('instagram-link').href = igUrl;
-    document.getElementById('instagram-link').textContent = `@${STORE_CONFIG.instagramUser}`;
+    document.getElementById('instagram-link').textContent = `@${STORE_CONFIG.instagramUser.replace('@', '')}`;
     document.getElementById('footer-ig').href = igUrl;
+  }
+
+  if (STORE_CONFIG.facebookUrl) {
+    document.getElementById('facebook-link').href = STORE_CONFIG.facebookUrl;
+  }
+
+  if (STORE_CONFIG.addressText) {
+    document.getElementById('address-text-info').textContent = STORE_CONFIG.addressText;
+  }
+
+  if (STORE_CONFIG.mapsUrl) {
+    document.getElementById('address-link').href = STORE_CONFIG.mapsUrl;
   }
 
   const hero = STORE_CONFIG.hero || {};

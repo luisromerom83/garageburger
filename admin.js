@@ -58,7 +58,13 @@ const addAnnouncementBtn = document.getElementById('add-announcement-btn');
 
 // Status & Categories Inputs
 const statusBtns = document.querySelectorAll('.status-btn');
+const cfgSchedule = document.getElementById('cfg-schedule');
 const cfgWa = document.getElementById('cfg-wa');
+const cfgPhone2 = document.getElementById('cfg-phone2');
+const cfgIg = document.getElementById('cfg-ig');
+const cfgFb = document.getElementById('cfg-fb');
+const cfgAddress = document.getElementById('cfg-address');
+const cfgMaps = document.getElementById('cfg-maps');
 const categoriesEditorList = document.getElementById('categories-editor-list');
 const addCategoryBtn = document.getElementById('add-category-btn');
 
@@ -486,7 +492,14 @@ async function saveAllToVercelStorage() {
   adminConfig.hero.description = heroDescInput.value.trim();
   adminConfig.hero.badgeLabel = heroBadgeLabelInput.value.trim();
   adminConfig.hero.badgeHighlight = heroBadgeHighlightInput.value.trim();
+
+  adminConfig.scheduleText = cfgSchedule.value.trim();
   adminConfig.whatsappPhone = cfgWa.value.trim();
+  adminConfig.secondaryPhone = cfgPhone2.value.trim();
+  adminConfig.instagramUser = cfgIg.value.trim();
+  adminConfig.facebookUrl = cfgFb.value.trim();
+  adminConfig.addressText = cfgAddress.value.trim();
+  adminConfig.mapsUrl = cfgMaps.value.trim();
 
   saveAllVercelBtn.disabled = true;
   saveAllVercelBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
