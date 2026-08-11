@@ -564,41 +564,10 @@ async function saveAllToVercelStorage() {
     if (response.ok) {
       alert('¡Excelente! Los cambios se han guardado exitosamente.');
     } else {
-      alert('Cambios guardados localmente. (Nota: Si estás usando GitHub Pages sin servidor activo, los cambios están guardados en tu navegador).');
+      alert('Cambios guardados localmente.');
     }
   } catch (err) {
     alert('Cambios guardados localmente en tu navegador. ¡Refresca para comprobar!');
-  } finally {
-    saveAllVercelBtn.disabled = false;
-    saveAllVercelBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Guardar Cambios en Vivo`;
-  }
-}
-
-  try {
-    const pin = adminConfig.adminPin || '1234';
-    const storeUrl = getApiEndpoint('/api/store');
-
-    const response = await fetch(storeUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        pin: pin,
-        config: adminConfig,
-        menu: adminMenu
-      })
-    });
-
-    const result = await response.json();
-
-    if (response.ok && result.success) {
-      localStorage.removeItem('gb_config_draft');
-      localStorage.removeItem('gb_menu_draft');
-      alert('¡Excelente! Los cambios se han guardado exitosamente.');
-    } else {
-      alert('Error guardando: ' + (result.error || 'Intenta de nuevo.'));
-    }
-  } catch (err) {
-    alert('Error de conexión con Vercel.');
   } finally {
     saveAllVercelBtn.disabled = false;
     saveAllVercelBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Guardar Cambios en Vivo`;
