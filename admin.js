@@ -229,6 +229,15 @@ function triggerFileUpload(onSuccessCallback) {
 
 async function loadAdminData() {
   try {
+    const savedConfig = localStorage.getItem('gb_live_config');
+    const savedMenu = localStorage.getItem('gb_live_menu');
+
+    if (savedConfig && savedMenu) {
+      adminConfig = JSON.parse(savedConfig);
+      adminMenu = JSON.parse(savedMenu);
+      populateAllFields();
+    }
+
     const apiUrl = getApiEndpoint('/api/store');
     const resApi = await fetch(apiUrl);
     
@@ -238,18 +247,22 @@ async function loadAdminData() {
         adminConfig = dataApi.config;
         adminMenu = dataApi.menu;
         availableAssets = dataApi.availableAssets || [];
+        localStorage.setItem('gb_live_config', JSON.stringify(adminConfig));
+        localStorage.setItem('gb_live_menu', JSON.stringify(adminMenu));
         populateAllFields();
         return;
       }
     }
 
-    const resCfg = await fetch('data/config.json');
-    adminConfig = await resCfg.json();
+    if (!savedConfig) {
+      const resCfg = await fetch('data/config.json');
+      adminConfig = await resCfg.json();
 
-    const resMenu = await fetch('data/menu.json');
-    adminMenu = await resMenu.json();
+      const resMenu = await fetch('data/menu.json');
+      adminMenu = await resMenu.json();
 
-    populateAllFields();
+      populateAllFields();
+    }
   } catch (err) {
     console.error('Error al cargar datos en admin:', err);
   }
@@ -527,8 +540,39 @@ async function saveAllToVercelStorage() {
   if (cfgAddress) adminConfig.addressText = cfgAddress.value.trim();
   if (cfgMaps) adminConfig.mapsUrl = cfgMaps.value.trim();
 
+  // 1. Immediate Instant Persistence in LocalStorage
+  localStorage.setItem('gb_live_config', JSON.stringify(adminConfig));
+  localStorage.setItem('gb_live_menu', JSON.stringify(adminMenu));
+
   saveAllVercelBtn.disabled = true;
   saveAllVercelBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
+
+  try {
+    const pin = adminConfig.adminPin || '1234';
+    const storeUrl = getApiEndpoint('/api/store');
+
+    const response = await fetch(storeUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pin: pin,
+        config: adminConfig,
+        menu: adminMenu
+      })
+    });
+
+    if (response.ok) {
+      alert('¡Excelente! Los cambios se han guardado exitosamente.');
+    } else {
+      alert('Cambios guardados localmente. (Nota: Si estás usando GitHub Pages sin servidor activo, los cambios están guardados en tu navegador).');
+    }
+  } catch (err) {
+    alert('Cambios guardados localmente en tu navegador. ¡Refresca para comprobar!');
+  } finally {
+    saveAllVercelBtn.disabled = false;
+    saveAllVercelBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Guardar Cambios en Vivo`;
+  }
+}
 
   try {
     const pin = adminConfig.adminPin || '1234';
