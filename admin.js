@@ -229,34 +229,15 @@ function triggerFileUpload(onSuccessCallback) {
 
 async function loadAdminData() {
   try {
-    const savedConfig = localStorage.getItem('gb_live_config');
-    const savedMenu = localStorage.getItem('gb_live_menu');
-
-    let hasLocal = false;
-    if (savedConfig && savedMenu) {
-      try {
-        adminConfig = JSON.parse(savedConfig);
-        adminMenu = JSON.parse(savedMenu);
-        hasLocal = true;
-        populateAllFields();
-      } catch (e) {
-        console.warn('Invalid local cache');
-      }
-    }
-
     const apiUrl = getApiEndpoint('/api/store');
     const resApi = await fetch(apiUrl);
     
     if (resApi.ok) {
       const dataApi = await resApi.json();
-      if (dataApi.availableAssets) {
-        availableAssets = dataApi.availableAssets || [];
-      }
-      
-      // Only overwrite local state if user hasn't saved local changes yet
-      if (!hasLocal && dataApi.config && dataApi.menu) {
+      if (dataApi.config && dataApi.menu) {
         adminConfig = dataApi.config;
         adminMenu = dataApi.menu;
+        availableAssets = dataApi.availableAssets || [];
         localStorage.setItem('gb_live_config', JSON.stringify(adminConfig));
         localStorage.setItem('gb_live_menu', JSON.stringify(adminMenu));
         populateAllFields();
@@ -264,15 +245,23 @@ async function loadAdminData() {
       }
     }
 
-    if (!hasLocal) {
-      const resCfg = await fetch('data/config.json');
-      adminConfig = await resCfg.json();
+    const savedConfig = localStorage.getItem('gb_live_config');
+    const savedMenu = localStorage.getItem('gb_live_menu');
 
-      const resMenu = await fetch('data/menu.json');
-      adminMenu = await resMenu.json();
-
+    if (savedConfig && savedMenu) {
+      adminConfig = JSON.parse(savedConfig);
+      adminMenu = JSON.parse(savedMenu);
       populateAllFields();
+      return;
     }
+
+    const resCfg = await fetch('data/config.json');
+    adminConfig = await resCfg.json();
+
+    const resMenu = await fetch('data/menu.json');
+    adminMenu = await resMenu.json();
+
+    populateAllFields();
   } catch (err) {
     console.error('Error al cargar datos en admin:', err);
   }

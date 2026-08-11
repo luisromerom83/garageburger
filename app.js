@@ -50,14 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Load Config & Menu from Vercel API, JSON or LocalStorage Draft Override
 async function loadStoreData() {
   try {
-    const liveCfg = localStorage.getItem('gb_live_config');
-    const liveMenu = localStorage.getItem('gb_live_menu');
-
-    if (liveCfg && liveMenu) {
-      STORE_CONFIG = JSON.parse(liveCfg);
-      MENU_ITEMS = JSON.parse(liveMenu);
-    }
-
     const apiUrl = getApiEndpoint('/api/store');
     const resApi = await fetch(apiUrl);
     
@@ -75,13 +67,20 @@ async function loadStoreData() {
       }
     }
 
-    if (!liveCfg) {
-      const resCfg = await fetch('data/config.json');
-      STORE_CONFIG = await resCfg.json();
+    const liveCfg = localStorage.getItem('gb_live_config');
+    const liveMenu = localStorage.getItem('gb_live_menu');
 
-      const resMenu = await fetch('data/menu.json');
-      MENU_ITEMS = await resMenu.json();
+    if (liveCfg && liveMenu) {
+      STORE_CONFIG = JSON.parse(liveCfg);
+      MENU_ITEMS = JSON.parse(liveMenu);
+      return;
     }
+
+    const resCfg = await fetch('data/config.json');
+    STORE_CONFIG = await resCfg.json();
+
+    const resMenu = await fetch('data/menu.json');
+    MENU_ITEMS = await resMenu.json();
   } catch (err) {
     console.error('Error al cargar datos de tienda:', err);
   }
