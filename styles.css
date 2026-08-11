@@ -297,33 +297,52 @@ img {
   width: 100%;
 }
 
-.cart-trigger {
-  display: flex;
+.btn-cart {
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-card);
+  background: linear-gradient(135deg, var(--bg-card) 0%, #1c2029 100%);
   border: 1px solid var(--primary-orange);
   color: #fff;
-  padding: 8px 18px;
+  padding: 10px 20px;
   border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 94, 0, 0.2);
+  transition: var(--transition-smooth);
+}
+
+.btn-cart:hover {
+  background: linear-gradient(135deg, var(--primary-orange) 0%, #d44d00 100%);
+  border-color: var(--primary-yellow);
+  box-shadow: 0 6px 20px var(--primary-orange-glow);
+  transform: translateY(-2px);
+}
+
+.btn-cart i {
+  color: var(--primary-yellow);
+  font-size: 1.1rem;
   transition: var(--transition-fast);
 }
 
-.cart-trigger:hover {
-  background: var(--primary-orange);
+.btn-cart:hover i {
+  color: #fff;
 }
 
 .cart-badge {
-  background: var(--accent-red);
+  background: var(--primary-orange);
   color: #fff;
   font-size: 0.8rem;
   font-weight: 800;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: flex;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
 /* Refined Hero Grid Layout to match exact mockup structure */
@@ -527,46 +546,62 @@ img {
   object-fit: cover;
 }
 
-.carousel-nav {
+.carousel-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(15, 17, 21, 0.8);
+  background: rgba(15, 17, 21, 0.85);
+  backdrop-filter: blur(8px);
   border: 1px solid var(--primary-orange);
-  color: #fff;
-  width: 44px;
-  height: 44px;
+  color: var(--primary-yellow);
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: var(--transition-fast);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  transition: var(--transition-smooth);
   z-index: 10;
+  font-size: 1.1rem;
 }
 
-.carousel-nav:hover {
+.carousel-btn:hover {
   background: var(--primary-orange);
+  color: #fff;
+  border-color: var(--primary-yellow);
+  box-shadow: 0 8px 25px var(--primary-orange-glow);
+  transform: translateY(-50%) scale(1.1);
 }
 
-.carousel-nav.prev-btn { left: 16px; }
-.carousel-nav.next-btn { right: 16px; }
+.carousel-btn.prev { left: 16px; }
+.carousel-btn.next { right: 16px; }
 
 .carousel-dots {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  padding: 16px 0;
+  gap: 10px;
+  padding: 18px 0;
   background: var(--bg-card);
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--border-color);
   cursor: pointer;
-  transition: var(--transition-fast);
+  transition: var(--transition-smooth);
+}
+
+.dot.active {
+  width: 28px;
+  border-radius: var(--radius-full);
+  background: var(--primary-orange);
+  border-color: var(--primary-yellow);
+  box-shadow: 0 0 10px var(--primary-orange-glow);
 }
 
 .dot.active {
