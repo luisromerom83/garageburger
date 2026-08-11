@@ -494,14 +494,20 @@ window.deleteItem = function(index) {
 };
 
 async function saveAllToVercelStorage() {
-  if (!adminConfig.hero) adminConfig.hero = {};
-  adminConfig.hero.title = heroTitleInput.value.trim();
-  adminConfig.hero.image = heroImageInput.value.trim();
-  adminConfig.hero.description = heroDescInput.value.trim();
-  adminConfig.hero.badgeLabel = heroBadgeLabelInput.value.trim();
-  adminConfig.hero.badgeHighlight = heroBadgeHighlightInput.value.trim();
+  if (!adminConfig || typeof adminConfig !== 'object') {
+    adminConfig = {};
+  }
+  if (!adminConfig.hero || typeof adminConfig.hero !== 'object') {
+    adminConfig.hero = {};
+  }
 
-  adminConfig.scheduleText = cfgSchedule.value.trim();
+  if (heroTitleInput) adminConfig.hero.title = heroTitleInput.value.trim();
+  if (heroImageInput) adminConfig.hero.image = heroImageInput.value.trim();
+  if (heroDescInput) adminConfig.hero.description = heroDescInput.value.trim();
+  if (heroBadgeLabelInput) adminConfig.hero.badgeLabel = heroBadgeLabelInput.value.trim();
+  if (heroBadgeHighlightInput) adminConfig.hero.badgeHighlight = heroBadgeHighlightInput.value.trim();
+
+  if (cfgSchedule) adminConfig.scheduleText = cfgSchedule.value.trim();
 
   const selectedDays = [];
   document.querySelectorAll('.day-chk:checked').forEach(chk => {
@@ -514,12 +520,12 @@ async function saveAllToVercelStorage() {
   if (openHrSelect) adminConfig.openHour = parseInt(openHrSelect.value, 10);
   if (closeHrSelect) adminConfig.closeHour = parseInt(closeHrSelect.value, 10);
 
-  adminConfig.whatsappPhone = cfgWa.value.trim();
-  adminConfig.secondaryPhone = cfgPhone2.value.trim();
-  adminConfig.instagramUser = cfgIg.value.trim();
-  adminConfig.facebookUrl = cfgFb.value.trim();
-  adminConfig.addressText = cfgAddress.value.trim();
-  adminConfig.mapsUrl = cfgMaps.value.trim();
+  if (cfgWa) adminConfig.whatsappPhone = cfgWa.value.trim();
+  if (cfgPhone2) adminConfig.secondaryPhone = cfgPhone2.value.trim();
+  if (cfgIg) adminConfig.instagramUser = cfgIg.value.trim();
+  if (cfgFb) adminConfig.facebookUrl = cfgFb.value.trim();
+  if (cfgAddress) adminConfig.addressText = cfgAddress.value.trim();
+  if (cfgMaps) adminConfig.mapsUrl = cfgMaps.value.trim();
 
   saveAllVercelBtn.disabled = true;
   saveAllVercelBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
