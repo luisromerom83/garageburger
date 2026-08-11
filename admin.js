@@ -1,4 +1,4 @@
-// Admin Dashboard CMS Logic for GarageBurger with Fallback Vercel Domain Resolver
+// Admin Dashboard CMS Logic for GarageBurger
 
 let adminMenu = [];
 let adminConfig = {};
@@ -6,7 +6,6 @@ let availableAssets = [];
 let activePickerCallback = null;
 let activeUploadCallback = null;
 
-// Popular FontAwesome Icons List for Tag Selection
 const POPULAR_ICONS = [
   { icon: 'fa-beer-mug-empty', label: '🍺 Cerveza' },
   { icon: 'fa-drumstick-bite', label: '🍗 Alitas / Boneless' },
@@ -22,16 +21,19 @@ const POPULAR_ICONS = [
   { icon: 'fa-truck-fast', label: '🚚 Domicilio' }
 ];
 
-// Helper: Smart Vercel API Base Resolver
 function getApiEndpoint(route) {
-  // Relative route when hosted on Vercel or localhost
-  if (!window.location.hostname.includes('github.io')) {
-    return route;
+  if (window.location.hostname.includes('github.io')) {
+    const vercelDomain = localStorage.getItem('gb_custom_vercel_domain') || 'https://garageburger.vercel.app';
+    return `${vercelDomain}${route}`;
   }
-  // Try default Vercel domain when accessed from GitHub Pages
-  const vercelDomain = localStorage.getItem('gb_custom_vercel_domain') || 'https://garageburger.vercel.app';
-  return `${vercelDomain}${route}`;
+  return route;
 }
+
+// Global Image Error Handler for Admin
+window.handleAdminImageError = function(imgElement) {
+  imgElement.onerror = null;
+  imgElement.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23181b22"/><text x="50%" y="50%" font-size="20" dominant-baseline="middle" text-anchor="middle" fill="%23ff5e00">Sin foto</text></svg>';
+};
 
 // DOM Elements
 const loginOverlay = document.getElementById('login-overlay');
@@ -204,7 +206,7 @@ function setupAdminListeners() {
           alert('Error al subir imagen: ' + (data.error || 'Intenta de nuevo'));
         }
       } catch (err) {
-        alert('Error de conexión subiendo imagen a Vercel.');
+        alert('Error de conexión subiendo imagen.');
       } finally {
         globalFileInput.value = '';
         activeUploadCallback = null;
@@ -291,7 +293,7 @@ function openImagePicker(onSelectCallback) {
 
   pickerGallery.innerHTML = availableAssets.map(asset => `
     <div class="asset-card" onclick="selectAsset('${asset.path}')">
-      <img src="${asset.path}" alt="${asset.filename}" onerror="this.src='assets/ilovegarage.png'">
+      <img src="${asset.path}" alt="${asset.filename}" onerror="handleAdminImageError(this)">
       <span>${asset.filename}</span>
     </div>
   `).join('');
@@ -346,7 +348,7 @@ function renderAnnouncementsEditor() {
         </div>
       </div>
       <div style="display: flex; gap: 12px; align-items: center;">
-        <img src="${ann.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" onerror="this.src='assets/ilovegarage.png'">
+        <img src="${ann.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" onerror="handleAdminImageError(this)">
         <textarea class="form-control" rows="2" placeholder="Descripción..." onchange="updateAnnouncement(${i}, 'description', this.value)">${ann.description}</textarea>
         <button class="btn btn-sm btn-outline" style="color: var(--accent-red); height: 42px;" onclick="deleteAnnouncement(${i})"><i class="fa-solid fa-trash"></i></button>
       </div>
@@ -410,7 +412,7 @@ function renderAdminTable() {
         </button>
       </td>
       <td>
-        <img src="${item.image}" class="image-preview-thumbnail" onerror="this.src='assets/ilovegarage.png'">
+        <img src="${item.image}" class="image-preview-thumbnail" onerror="handleAdminImageError(this)">
       </td>
       <td>
         <div style="display: flex; gap: 6px; min-width: 260px;">
@@ -513,7 +515,7 @@ async function saveAllToVercelStorage() {
       alert('Error guardando: ' + (result.error || 'Intenta de nuevo.'));
     }
   } catch (err) {
-    alert('Error de conexión con Vercel. Si estás en GitHub Pages, asegúrate de ingresar la URL pública de tu despliegue en Vercel.');
+    alert('Error de conexión con Vercel.');
   } finally {
     saveAllVercelBtn.disabled = false;
     saveAllVercelBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Guardar Cambios en Vivo`;

@@ -14,6 +14,12 @@ function getApiEndpoint(route) {
   return route;
 }
 
+// Global Image Error Handler (prevents infinite 404 loops)
+window.handleImageError = function(imgElement) {
+  imgElement.onerror = null;
+  imgElement.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23181b22"/><text x="50%" y="50%" font-size="30" dominant-baseline="middle" text-anchor="middle" fill="%23ff5e00">🍔</text></svg>';
+};
+
 // DOM Elements
 const menuGrid = document.getElementById('menu-grid');
 const categoryFilterTabs = document.getElementById('category-filter-tabs');
@@ -181,7 +187,7 @@ function initCarousel() {
         <p>${ann.description}</p>
       </div>
       <div class="slide-img-wrap">
-        <img src="${ann.image}" alt="${ann.title}" onerror="this.src='assets/Screenshot_20260810_105000.png'">
+        <img src="${ann.image}" alt="${ann.title}" onerror="handleImageError(this)">
       </div>
     </div>
   `).join('');
@@ -239,7 +245,7 @@ function renderFavorites() {
   favoritesGrid.innerHTML = favorites.map(item => `
     <div class="card card-special">
       <div class="card-img-wrap">
-        <img src="${item.image}" alt="${item.name}" onerror="this.src='assets/ilovegarage.png'">
+        <img src="${item.image}" alt="${item.name}" onerror="handleImageError(this)">
         <span class="card-badge badge-yellow">⭐ Favorito</span>
       </div>
       <div class="card-body">
@@ -292,7 +298,7 @@ function renderMenu(items) {
     return `
       <div class="card ${!isAvailable ? 'unavailable-card' : ''}" data-category="${item.category}" style="${!isAvailable ? 'opacity: 0.55; filter: grayscale(0.6);' : ''}">
         <div class="card-img-wrap">
-          <img src="${item.image}" alt="${item.name}" onerror="this.src='assets/ilovegarage.png'">
+          <img src="${item.image}" alt="${item.name}" onerror="handleImageError(this)">
           ${item.badge ? `<span class="card-badge">${item.badge}</span>` : ''}
           ${!isAvailable ? `<span class="card-badge badge-red" style="left: 12px; right: auto;">AGOTADO</span>` : ''}
         </div>
