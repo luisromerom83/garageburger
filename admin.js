@@ -298,6 +298,12 @@ function populateAllFields() {
   if (closeHrSelect) closeHrSelect.value = adminConfig.closeHour !== undefined ? adminConfig.closeHour : 23;
 
   if (cfgWa) cfgWa.value = adminConfig.whatsappPhone || '522871270483';
+  if (cfgPhone2) cfgPhone2.value = adminConfig.secondaryPhone || '';
+  if (cfgIg) cfgIg.value = adminConfig.instagramUser || '';
+  if (cfgFb) cfgFb.value = adminConfig.facebookUrl || '';
+  if (cfgAddress) cfgAddress.value = adminConfig.addressText || '';
+  if (cfgMaps) cfgMaps.value = adminConfig.mapsUrl || '';
+
   const st = adminConfig.statusOverride || 'auto';
   statusBtns.forEach(btn => {
     if (btn.getAttribute('data-status') === st) {
