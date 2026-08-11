@@ -38,7 +38,7 @@
   <nav class="navbar">
     <div class="container nav-container">
       <a href="#" class="brand-logo">
-        <img src="assets/logo.png" alt="Garage Burger Logo" onerror="this.src='assets/ilovegarage.png'">
+        <img src="assets/logo.png" alt="Garage Burger Logo" onerror="handleImageError(this)">
         <div class="brand-text">
           <span class="brand-title" id="nav-brand-title">GARAGE BURGER</span>
           <span class="brand-subtitle" id="nav-brand-subtitle">BUEN AMBIENTE & MEJOR SABOR</span>
@@ -48,37 +48,34 @@
       <div class="nav-links">
         <a href="#anuncios" class="nav-link">Novedades</a>
         <a href="#especiales" class="nav-link">Favoritos</a>
-        <a href="#menu" class="nav-link">Menú</a>
-        <a href="#contacto" class="nav-link">Ubicación</a>
+        <a href="#menu" class="nav-link">Menú Completo</a>
+        <a href="#contacto" class="nav-link">Ubicación y Horario</a>
       </div>
 
-      <button id="cart-btn" class="cart-trigger">
-        <i class="fa-solid fa-burger"></i>
-        <span class="cart-text">Tu Pedido</span>
-        <span id="cart-count" class="cart-badge">0</span>
-      </button>
+      <div class="nav-actions">
+        <button id="cart-btn" class="btn-cart">
+          <i class="fa-solid fa-burger"></i>
+          <span>Mi Pedido</span>
+          <span id="cart-count" class="cart-badge">0</span>
+        </button>
+      </div>
     </div>
   </nav>
 
-  <!-- Hero Section (Fully Editable via Config) -->
+  <!-- Hero Section -->
   <header class="hero">
-    <div class="hero-overlay"></div>
-    <div class="container hero-content">
-      <div class="hero-text-block">
-        <div class="badge-tag" id="hero-badge-tag"><i class="fa-solid fa-fire-flame-curved"></i> ¡BIENVENIDOS A GARAGE BURGER!</div>
-        <h1 class="hero-title" id="hero-title">HAMBURGUESAS JUGOSAS & <span class="text-gradient">CERVEZA DE BARRIL</span></h1>
-        <p class="hero-description" id="hero-description">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="badge-tag">
+          <i class="fa-solid fa-fire"></i> <span id="hero-badge-label">Sabor Legendario</span> • <span id="hero-badge-highlight" class="text-yellow">¡Te vas a antojar!</span>
+        </div>
+        
+        <h1 id="hero-title" class="hero-title">HAMBURGUESAS JUGOSAS & CERVEZA DE BARRIL</h1>
+        
+        <p id="hero-description" class="hero-description">
           Disfruta de nuestras costillas BBQ ahumadas, Pulled Pork suave con ensalada de col en pan brioche, Boneless bañados en salsas habanero y aros de cebolla crujientes.
         </p>
 
-        <div class="hero-actions">
-          <a href="#menu" class="btn btn-primary"><i class="fa-solid fa-utensils"></i> Explorar Menú</a>
-          <a href="https://wa.me/522871270483" id="hero-wa-btn" target="_blank" class="btn btn-whatsapp">
-            <i class="fa-brands fa-whatsapp"></i> Pedir por WhatsApp
-          </a>
-        </div>
-
-        <!-- Dynamic Hero Feature Tags -->
         <div class="hero-features" id="hero-features-list">
           <div class="feature-item">
             <i class="fa-solid fa-beer-mug-empty"></i>
@@ -90,112 +87,118 @@
           </div>
           <div class="feature-item">
             <i class="fa-solid fa-award"></i>
-            <span>Salsas Artesanales</span>
+            <span>Pan Brioche Artesanal</span>
           </div>
+        </div>
+
+        <div class="hero-cta-group">
+          <a href="#menu" class="btn btn-primary btn-lg"><i class="fa-solid fa-utensils"></i> Explorar Menú</a>
+          <a href="https://wa.me/522871270483" id="hero-wa-btn" target="_blank" class="btn btn-whatsapp btn-lg"><i class="fa-brands fa-whatsapp"></i> Pedir por WhatsApp</a>
         </div>
       </div>
 
       <div class="hero-visual">
-        <div class="hero-card-glow">
-          <img src="assets/Screenshot_20260810_105331.png" id="hero-img" alt="Garage Burger Hero" class="hero-img">
-          <div class="floating-badge badge-price">
-            <span class="label" id="hero-badge-label">Sabor Legendario</span>
-            <span class="highlight" id="hero-badge-highlight">¡Te vas a antojar!</span>
-          </div>
+        <div class="hero-img-card">
+          <img id="hero-img" src="assets/Screenshot_20260810_105331.png" alt="Hamburguesa Especial Garage Burger" onerror="handleImageError(this)">
+          <div class="visual-glow"></div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- NEW: Announcement Carousel Section (Directly Below Hero) -->
-  <section id="anuncios" class="section bg-darker announcement-carousel-section">
+  <!-- Announcement Carousel Section -->
+  <section id="anuncios" class="announcement-carousel-section">
     <div class="container">
       <div class="carousel-container">
-        <div class="carousel-track-wrapper">
-          <div class="carousel-track" id="carousel-track">
-            <!-- Carousel slides rendered dynamically from config.announcements -->
-          </div>
+        <div class="carousel-track" id="carousel-track">
+          <!-- Rendered via JS -->
         </div>
 
-        <!-- Carousel Navigation Controls -->
-        <button class="carousel-nav prev-btn" id="carousel-prev"><i class="fa-solid fa-chevron-left"></i></button>
-        <button class="carousel-nav next-btn" id="carousel-next"><i class="fa-solid fa-chevron-right"></i></button>
-        
-        <!-- Indicators -->
-        <div class="carousel-dots" id="carousel-dots"></div>
+        <button class="carousel-btn prev" id="carousel-prev"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="carousel-btn next" id="carousel-next"><i class="fa-solid fa-chevron-right"></i></button>
+
+        <div class="carousel-dots" id="carousel-dots">
+          <!-- Rendered via JS -->
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Favoritos del Garage Section (Rendered from isFavorite: true) -->
-  <section id="especiales" class="section">
+  <!-- Special Recommendations / Favorites -->
+  <section id="especiales" class="section bg-darker">
     <div class="container">
       <div class="section-header text-center">
-        <h2 class="section-title">LOS FAVORITOS DEL <span class="text-orange">GARAGE</span> ⭐</h2>
-        <p class="section-subtitle">Los platillos más pedidos por nuestros clientes estrella</p>
+        <span class="section-subtitle">IMPRESCINDIBLES</span>
+        <h2 class="section-title">LOS FAVORITOS DE GARAGE</h2>
+        <div class="heading-line"></div>
       </div>
 
-      <div id="favorites-grid" class="grid grid-3">
-        <!-- Rendered dynamically from isFavorite items -->
+      <div class="grid grid-3" id="favorites-grid">
+        <!-- Favorites rendered dynamically via JS -->
       </div>
     </div>
   </section>
 
-  <!-- Interactive Menu Section -->
-  <section id="menu" class="section bg-darker">
+  <!-- Main Menu Catalog -->
+  <section id="menu" class="section">
     <div class="container">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">NUESTRO MENÚ COMPLETO</h2>
-          <p class="section-subtitle">Selecciona tus platillos y arma tu pedido fácilmente</p>
-        </div>
+      <div class="section-header text-center">
+        <span class="section-subtitle">NUESTRA CARTA</span>
+        <h2 class="section-title">NUESTRO MENÚ COMPLETO</h2>
+        <div class="heading-line"></div>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="menu-controls">
         <div class="search-box">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="menu-search" placeholder="Buscar hamburguesa, boneless, cerveza...">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="menu-search" placeholder="Buscar por platillo, ingrediente o salsa...">
+        </div>
+
+        <div class="filter-tabs" id="category-filter-tabs">
+          <!-- Tabs rendered dynamically via JS -->
         </div>
       </div>
 
-      <!-- Categories Filter Tabs (Dynamic) -->
-      <div class="filter-tabs" id="category-filter-tabs">
-        <!-- Tabs rendered dynamically from config.categories -->
-      </div>
-
-      <!-- Menu Items Grid -->
-      <div id="menu-grid" class="grid grid-3">
-        <!-- Rendered dynamically via JS -->
+      <!-- Products Grid -->
+      <div class="grid grid-4" id="menu-grid">
+        <!-- Rendered via JS -->
       </div>
     </div>
   </section>
 
-  <!-- Location & Operating Hours -->
-  <section id="contacto" class="section">
+  <!-- Contact & Hours Section -->
+  <section id="contacto" class="section bg-darker">
     <div class="container">
-      <div class="grid grid-2">
-        <div class="contact-card">
-          <h2 class="section-title">VISÍTANOS O HAZ TU PEDIDO</h2>
-          <p class="contact-desc">
-            Ven a disfrutar del mejor ambiente y sabor. Servicio para llevar y pedidos a domicilio en el horario especificado.
-          </p>
+      <div class="section-header text-center">
+        <span class="section-subtitle">VISÍTANOS O PIDE A DOMICILIO</span>
+        <h2 class="section-title">UBICACIÓN Y HORARIOS</h2>
+        <div class="heading-line"></div>
+      </div>
 
-          <div class="contact-info-list">
+      <div class="grid grid-2 contact-grid">
+        <div class="contact-card">
+          <h3><i class="fa-solid fa-store text-orange"></i> Garage Burger</h3>
+          
+          <div class="info-list">
             <div class="info-item">
-              <div class="info-icon"><i class="fa-regular fa-clock"></i></div>
+              <i class="fa-solid fa-clock text-yellow"></i>
               <div>
                 <h4>Horario de Atención</h4>
-                <p id="schedule-text-info">Jueves a Domingo: 7:00 PM a 11:00 PM</p>
+                <p id="schedule-text-info">Jueves a Domingo de 7:00 PM a 11:00 PM</p>
               </div>
             </div>
 
             <div class="info-item">
-              <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
+              <i class="fa-solid fa-phone text-yellow"></i>
               <div>
-                <h4>Teléfonos de Pedidos</h4>
-                <p id="phones-text-info">287 121 2221 / 287 127 0483</p>
+                <h4>Teléfonos / WhatsApp</h4>
+                <p id="phones-text-info">287 127 0483</p>
               </div>
             </div>
 
             <div class="info-item">
-              <div class="info-icon"><i class="fa-brands fa-instagram"></i></div>
+              <i class="fa-brands fa-instagram text-yellow"></i>
               <div>
                 <h4>Síguenos en Instagram</h4>
                 <p><a href="https://instagram.com/GARAGE_BURGER_19" id="instagram-link" target="_blank" class="text-orange">@GARAGE_BURGER_19</a></p>
@@ -213,7 +216,7 @@
 
         <div class="contact-card highlight-card">
           <div class="beer-feature">
-            <img src="assets/CervezadeBarril.png" alt="Cerveza de Barril Helada Garage Burger" class="beer-img">
+            <img src="assets/CervezadeBarril.png" alt="Cerveza de Barril Helada Garage Burger" class="beer-img" onerror="handleImageError(this)">
             <h3>¡CERVEZA DE BARRIL HELADA!</h3>
             <p>La compañera perfecta para tus hamburguesas jugosas y boneless. También contamos con Cerveza de Raíz y flotantes.</p>
             <div class="beer-prices">
@@ -232,7 +235,7 @@
   <footer class="footer">
     <div class="container footer-content">
       <div class="footer-brand">
-        <img src="assets/logo.png" alt="Garage Burger Logo" onerror="this.src='assets/ilovegarage.png'" class="footer-logo">
+        <img src="assets/logo.png" alt="Garage Burger Logo" onerror="handleImageError(this)" class="footer-logo">
         <p>© 2026 Garage Burger - Hamburguesas jugosas, cerveza de barril y el mejor sabor.</p>
       </div>
       <div class="footer-links">
