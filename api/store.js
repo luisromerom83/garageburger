@@ -109,11 +109,14 @@ module.exports = async (req, res) => {
     // C. Try Supabase Client
     if (supabase) {
       try {
-        const { data: cfgData } = await supabase.from('garage_config').select('config_data').eq('id', 1).single();
-        const { data: menuData } = await supabase.from('garage_menu').select('*').order('created_at', { ascending: true });
+        const { data: cfgData, error: cfgErr } = await supabase.from('garage_config').select('config_data').eq('id', 1).maybeSingle();
+        const { data: menuData, error: menuErr } = await supabase.from('garage_menu').select('*').order('created_at', { ascending: true });
 
-        if (cfgData && menuData && menuData.length > 0) {
-          const formattedMenu = menuData.map(m => ({
+        if (cfgErr) console.warn('Supabase config error:', cfgErr.message);
+        if (menuErr) console.warn('Supabase menu error:', menuErr.message);
+
+        if (cfgData && cfgData.config_data) {
+          const formattedMenu = (menuData || []).map(m => ({
             id: m.id,
             name: m.name,
             category: m.category,
@@ -127,7 +130,7 @@ module.exports = async (req, res) => {
 
           return res.status(200).json({
             config: cfgData.config_data,
-            menu: formattedMenu,
+            menu: formattedMenu.length > 0 ? formattedMenu : (getFallbackStore().menu),
             availableAssets: assetsList
           });
         }
@@ -193,11 +196,12 @@ module.exports = async (req, res) => {
       if (supabase) {
         try {
           if (config) {
-            await supabase.from('garage_config').upsert({
+            const { error: cfgErr } = await supabase.from('garage_config').upsert({
               id: 1,
               config_data: config,
               updated_at: new Date().toISOString()
             });
+            if (cfgErr) console.warn('Supabase config upsert error:', cfgErr.message);
           }
           if (menu && menu.length > 0) {
             const dbRows = menu.map(m => ({
@@ -211,7 +215,8 @@ module.exports = async (req, res) => {
               available: m.available !== false,
               is_favorite: m.isFavorite === true
             }));
-            await supabase.from('garage_menu').upsert(dbRows, { onConflict: 'id' });
+            const { error: menuErr } = await supabase.from('garage_menu').upsert(dbRows, { onConflict: 'id' });
+            if (menuErr) console.warn('Supabase menu upsert error:', menuErr.message);
           }
         } catch (err) {
           console.warn('Supabase save error:', err.message);
