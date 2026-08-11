@@ -6,6 +6,14 @@ let cart = [];
 let currentCarouselIndex = 0;
 let carouselInterval = null;
 
+// Helper: Smart Vercel API Base Resolver
+function getApiEndpoint(route) {
+  if (window.location.hostname.includes('github.io')) {
+    return `https://garageburger.vercel.app${route}`;
+  }
+  return route;
+}
+
 // DOM Elements
 const menuGrid = document.getElementById('menu-grid');
 const categoryFilterTabs = document.getElementById('category-filter-tabs');
@@ -36,7 +44,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Load Config & Menu from Vercel API, JSON or LocalStorage Draft Override
 async function loadStoreData() {
   try {
-    // 1. Try LocalStorage draft first (if user is editing in admin locally)
     const draftCfg = localStorage.getItem('gb_config_draft');
     const draftMenu = localStorage.getItem('gb_menu_draft');
 
@@ -46,18 +53,21 @@ async function loadStoreData() {
       return;
     }
 
-    // 2. Try Vercel Serverless API /api/store
-    const resApi = await fetch('/api/store');
+    const apiUrl = getApiEndpoint('/api/store');
+    const resApi = await fetch(apiUrl);
+    
     if (resApi.ok) {
-      const dataApi = await resApi.json();
-      if (dataApi.config && dataApi.menu) {
-        STORE_CONFIG = dataApi.config;
-        MENU_ITEMS = dataApi.menu;
-        return;
+      const contentType = resApi.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const dataApi = await resApi.json();
+        if (dataApi.config && dataApi.menu) {
+          STORE_CONFIG = dataApi.config;
+          MENU_ITEMS = dataApi.menu;
+          return;
+        }
       }
     }
 
-    // 3. Fallback to static JSON files
     const resCfg = await fetch('data/config.json');
     STORE_CONFIG = await resCfg.json();
 
@@ -68,19 +78,16 @@ async function loadStoreData() {
   }
 }
 
-// Apply Store Config (Hero, Announcement, Operating Status, WhatsApp, Categories)
+// Apply Store Config
 function applyStoreConfig() {
-  // Brand Header
   if (STORE_CONFIG.storeName) document.getElementById('nav-brand-title').textContent = STORE_CONFIG.storeName;
   if (STORE_CONFIG.storeSubtitle) document.getElementById('nav-brand-subtitle').textContent = STORE_CONFIG.storeSubtitle;
 
-  // Top Announcement Banner
   const topAnnouncement = document.getElementById('top-announcement-text');
   if (topAnnouncement && STORE_CONFIG.announcementText) {
     topAnnouncement.innerHTML = `<i class="fa-solid fa-bullhorn"></i> ${STORE_CONFIG.announcementText}`;
   }
 
-  // Links & Phone Numbers
   const phone = STORE_CONFIG.whatsappPhone || '522871270483';
   const waUrl = `https://wa.me/${phone}`;
 
@@ -102,7 +109,6 @@ function applyStoreConfig() {
     document.getElementById('footer-ig').href = igUrl;
   }
 
-  // Hero Section Dynamic Rendering
   const hero = STORE_CONFIG.hero || {};
   if (hero.title) document.getElementById('hero-title').innerHTML = hero.title;
   if (hero.description) document.getElementById('hero-description').textContent = hero.description;
@@ -120,11 +126,9 @@ function applyStoreConfig() {
     `).join('');
   }
 
-  // Status check
   checkOperatingStatus();
 }
 
-// Operating Status Check
 function checkOperatingStatus() {
   const override = STORE_CONFIG.statusOverride || 'auto';
 
@@ -140,7 +144,6 @@ function checkOperatingStatus() {
     return;
   }
 
-  // Automatic Day & Hour Check
   const now = new Date();
   const day = now.getDay();
   const hour = now.getHours();
@@ -157,7 +160,6 @@ function checkOperatingStatus() {
   }
 }
 
-// Render Announcement Carousel
 function initCarousel() {
   const announcements = STORE_CONFIG.announcements || [];
   const track = document.getElementById('carousel-track');
@@ -225,7 +227,6 @@ function startAutoPlay(length) {
   }, 6000);
 }
 
-// Render Favoritos (isFavorite: true)
 function renderFavorites() {
   const favoritesGrid = document.getElementById('favorites-grid');
   const favorites = MENU_ITEMS.filter(item => item.isFavorite === true);
@@ -255,7 +256,6 @@ function renderFavorites() {
   `).join('');
 }
 
-// Render Categories Tabs Dynamically from Config
 function renderCategoryTabs() {
   const categories = STORE_CONFIG.categories || [
     { id: 'todos', name: 'Todos' },
@@ -276,7 +276,6 @@ function renderCategoryTabs() {
   categoryFilterTabs.innerHTML = html;
 }
 
-// Render Menu Cards
 function renderMenu(items) {
   if (items.length === 0) {
     menuGrid.innerHTML = `
@@ -323,7 +322,6 @@ function renderMenu(items) {
   });
 }
 
-// Filter and Search Event Listeners
 function setupEventListeners() {
   categoryFilterTabs.addEventListener('click', (e) => {
     if (e.target.classList.contains('filter-btn')) {
@@ -366,7 +364,6 @@ function filterMenu(category, query) {
   renderMenu(filtered);
 }
 
-// Cart Logic
 function addToCart(itemId) {
   const item = MENU_ITEMS.find(i => i.id === itemId);
   if (!item || item.available === false) return;

@@ -1,4 +1,4 @@
-// Admin Dashboard CMS Logic for GarageBurger with Direct Image Upload & Supabase Storage
+// Admin Dashboard CMS Logic for GarageBurger with Intelligent API URL Resolver
 
 let adminMenu = [];
 let adminConfig = {};
@@ -21,6 +21,16 @@ const POPULAR_ICONS = [
   { icon: 'fa-tag', label: '🏷️ Oferta' },
   { icon: 'fa-truck-fast', label: '🚚 Domicilio' }
 ];
+
+// Helper: Smart Vercel API Base Resolver (Works on GitHub Pages, Vercel, and Localhost)
+function getApiEndpoint(route) {
+  // If running on GitHub Pages (luisromerom83.github.io), point to Vercel API backend
+  if (window.location.hostname.includes('github.io')) {
+    return `https://garageburger.vercel.app${route}`;
+  }
+  // Standard relative route for Vercel deployment or local server
+  return route;
+}
 
 // DOM Elements
 const loginOverlay = document.getElementById('login-overlay');
@@ -143,7 +153,6 @@ function setupAdminListeners() {
     renderAdminTable();
   });
 
-  // Hero Upload & Explorer Buttons
   document.querySelectorAll('.upload-trigger-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const targetId = e.currentTarget.getAttribute('data-target');
@@ -164,7 +173,6 @@ function setupAdminListeners() {
 
   closePickerBtn.addEventListener('click', closeImagePicker);
 
-  // Global File Input Change Handler
   globalFileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -174,7 +182,8 @@ function setupAdminListeners() {
       const base64 = reader.result;
       
       try {
-        const response = await fetch('/api/upload', {
+        const uploadUrl = getApiEndpoint('/api/upload');
+        const response = await fetch(uploadUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -183,6 +192,11 @@ function setupAdminListeners() {
             fileType: file.type
           })
         });
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Respuesta no válida del servidor. Verifica la URL de Vercel.');
+        }
 
         const data = await response.json();
         if (response.ok && data.url) {
@@ -211,15 +225,20 @@ function triggerFileUpload(onSuccessCallback) {
 
 async function loadAdminData() {
   try {
-    const resApi = await fetch('/api/store');
+    const apiUrl = getApiEndpoint('/api/store');
+    const resApi = await fetch(apiUrl);
+    
     if (resApi.ok) {
-      const dataApi = await resApi.json();
-      if (dataApi.config && dataApi.menu) {
-        adminConfig = dataApi.config;
-        adminMenu = dataApi.menu;
-        availableAssets = dataApi.availableAssets || [];
-        populateAllFields();
-        return;
+      const contentType = resApi.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const dataApi = await resApi.json();
+        if (dataApi.config && dataApi.menu) {
+          adminConfig = dataApi.config;
+          adminMenu = dataApi.menu;
+          availableAssets = dataApi.availableAssets || [];
+          populateAllFields();
+          return;
+        }
       }
     }
 
@@ -260,7 +279,6 @@ function populateAllFields() {
   renderAdminTable();
 }
 
-// Image Explorer Modal Methods
 function openImagePicker(onSelectCallback) {
   activePickerCallback = onSelectCallback;
   imagePickerModal.classList.add('active');
@@ -480,7 +498,9 @@ async function saveAllToVercelStorage() {
 
   try {
     const pin = adminConfig.adminPin || '1234';
-    const response = await fetch('/api/store', {
+    const storeUrl = getApiEndpoint('/api/store');
+
+    const response = await fetch(storeUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -490,12 +510,17 @@ async function saveAllToVercelStorage() {
       })
     });
 
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Respuesta no válida del servidor. Verifica la URL de Vercel.');
+    }
+
     const result = await response.json();
 
     if (response.ok && result.success) {
       localStorage.removeItem('gb_config_draft');
       localStorage.removeItem('gb_menu_draft');
-      alert('¡Excelente! Los cambios se han guardado exitosamente.');
+      alert('¡Excelente! Los cambios se han guardado exitosamente en Vivo.');
     } else {
       alert('Error guardando: ' + (result.error || 'Intenta de nuevo.'));
     }
