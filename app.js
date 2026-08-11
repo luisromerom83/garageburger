@@ -167,15 +167,26 @@ function checkOperatingStatus() {
   const day = now.getDay();
   const hour = now.getHours();
 
-  const isOperatingDay = [0, 4, 5, 6].includes(day);
-  const isOperatingHour = hour >= 19 && hour < 23;
+  const activeDays = STORE_CONFIG.activeDays || [0, 4, 5, 6];
+  const openHour = STORE_CONFIG.openHour !== undefined ? STORE_CONFIG.openHour : 19;
+  const closeHour = STORE_CONFIG.closeHour !== undefined ? STORE_CONFIG.closeHour : 23;
+
+  const isOperatingDay = activeDays.includes(day);
+  let isOperatingHour = false;
+
+  if (closeHour > openHour) {
+    isOperatingHour = hour >= openHour && hour < closeHour;
+  } else {
+    // Overnight schedule (e.g. 7:00 PM to 2:00 AM)
+    isOperatingHour = hour >= openHour || hour < closeHour;
+  }
 
   if (isOperatingDay && isOperatingHour) {
     statusBadge.className = 'badge-status open';
     statusText.textContent = 'ABIERTO AHORA';
   } else {
     statusBadge.className = 'badge-status closed';
-    statusText.textContent = 'CERRADO (Abrimos Jue-Dom 7PM)';
+    statusText.textContent = `CERRADO (${STORE_CONFIG.scheduleText || 'Horario en sitio'})`;
   }
 }
 

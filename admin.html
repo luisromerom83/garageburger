@@ -354,6 +354,51 @@
         </div>
       </div>
 
+      <!-- Configurable Operating Days & Hours for Auto Mode -->
+      <div style="background: var(--bg-dark); border: 1px solid var(--border-color); padding: 18px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+        <label style="color: var(--primary-yellow); font-weight: 700; display: block; margin-bottom: 12px;">
+          <i class="fa-solid fa-clock"></i> Configurar Días y Horas de Apertura (Para Modo Automático):
+        </label>
+        
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 16px;" id="days-checkboxes-container">
+          <label><input type="checkbox" class="day-chk" value="1"> Lunes</label>
+          <label><input type="checkbox" class="day-chk" value="2"> Martes</label>
+          <label><input type="checkbox" class="day-chk" value="3"> Miércoles</label>
+          <label><input type="checkbox" class="day-chk" value="4"> Jueves</label>
+          <label><input type="checkbox" class="day-chk" value="5"> Viernes</label>
+          <label><input type="checkbox" class="day-chk" value="6"> Sábado</label>
+          <label><input type="checkbox" class="day-chk" value="0"> Domingo</label>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Hora de Apertura:</label>
+            <select id="cfg-open-hour" class="form-control">
+              <option value="12">12:00 PM</option>
+              <option value="13">1:00 PM</option>
+              <option value="14">2:00 PM</option>
+              <option value="15">3:00 PM</option>
+              <option value="16">4:00 PM</option>
+              <option value="17">5:00 PM</option>
+              <option value="18">6:00 PM</option>
+              <option value="19">7:00 PM</option>
+              <option value="20">8:00 PM</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Hora de Cierre:</label>
+            <select id="cfg-close-hour" class="form-control">
+              <option value="21">9:00 PM</option>
+              <option value="22">10:00 PM</option>
+              <option value="23">11:00 PM</option>
+              <option value="0">12:00 AM (Medianoche)</option>
+              <option value="1">1:00 AM</option>
+              <option value="2">2:00 AM</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-2">
         <div class="form-group">
           <label>Teléfono WhatsApp Principal (con LADA 52...):</label>

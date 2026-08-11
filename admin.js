@@ -262,11 +262,19 @@ function populateAllFields() {
   heroDescInput.value = hero.description || '';
   heroBadgeLabelInput.value = hero.badgeLabel || '';
   heroBadgeHighlightInput.value = hero.badgeHighlight || '';
-  renderHeroFeatures();
+  if (cfgSchedule) cfgSchedule.value = adminConfig.scheduleText || 'Jueves a Domingo: 7:00 PM - 11:00 PM';
+  
+  const activeDays = adminConfig.activeDays || [0, 4, 5, 6];
+  document.querySelectorAll('.day-chk').forEach(chk => {
+    chk.checked = activeDays.includes(parseInt(chk.value, 10));
+  });
 
-  renderAnnouncementsEditor();
+  const openHrSelect = document.getElementById('cfg-open-hour');
+  const closeHrSelect = document.getElementById('cfg-close-hour');
+  if (openHrSelect) openHrSelect.value = adminConfig.openHour !== undefined ? adminConfig.openHour : 19;
+  if (closeHrSelect) closeHrSelect.value = adminConfig.closeHour !== undefined ? adminConfig.closeHour : 23;
 
-  cfgWa.value = adminConfig.whatsappPhone || '522871270483';
+  if (cfgWa) cfgWa.value = adminConfig.whatsappPhone || '522871270483';
   const st = adminConfig.statusOverride || 'auto';
   statusBtns.forEach(btn => {
     if (btn.getAttribute('data-status') === st) {
@@ -494,6 +502,18 @@ async function saveAllToVercelStorage() {
   adminConfig.hero.badgeHighlight = heroBadgeHighlightInput.value.trim();
 
   adminConfig.scheduleText = cfgSchedule.value.trim();
+
+  const selectedDays = [];
+  document.querySelectorAll('.day-chk:checked').forEach(chk => {
+    selectedDays.push(parseInt(chk.value, 10));
+  });
+  adminConfig.activeDays = selectedDays;
+
+  const openHrSelect = document.getElementById('cfg-open-hour');
+  const closeHrSelect = document.getElementById('cfg-close-hour');
+  if (openHrSelect) adminConfig.openHour = parseInt(openHrSelect.value, 10);
+  if (closeHrSelect) adminConfig.closeHour = parseInt(closeHrSelect.value, 10);
+
   adminConfig.whatsappPhone = cfgWa.value.trim();
   adminConfig.secondaryPhone = cfgPhone2.value.trim();
   adminConfig.instagramUser = cfgIg.value.trim();
