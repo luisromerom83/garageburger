@@ -1,4 +1,4 @@
-// Admin Dashboard CMS Logic for GarageBurger with Intelligent API URL Resolver
+// Admin Dashboard CMS Logic for GarageBurger with Fallback Vercel Domain Resolver
 
 let adminMenu = [];
 let adminConfig = {};
@@ -22,14 +22,15 @@ const POPULAR_ICONS = [
   { icon: 'fa-truck-fast', label: '🚚 Domicilio' }
 ];
 
-// Helper: Smart Vercel API Base Resolver (Works on GitHub Pages, Vercel, and Localhost)
+// Helper: Smart Vercel API Base Resolver
 function getApiEndpoint(route) {
-  // If running on GitHub Pages (luisromerom83.github.io), point to Vercel API backend
-  if (window.location.hostname.includes('github.io')) {
-    return `https://garageburger.vercel.app${route}`;
+  // Relative route when hosted on Vercel or localhost
+  if (!window.location.hostname.includes('github.io')) {
+    return route;
   }
-  // Standard relative route for Vercel deployment or local server
-  return route;
+  // Try default Vercel domain when accessed from GitHub Pages
+  const vercelDomain = localStorage.getItem('gb_custom_vercel_domain') || 'https://garageburger.vercel.app';
+  return `${vercelDomain}${route}`;
 }
 
 // DOM Elements
@@ -193,11 +194,6 @@ function setupAdminListeners() {
           })
         });
 
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('Respuesta no válida del servidor. Verifica la URL de Vercel.');
-        }
-
         const data = await response.json();
         if (response.ok && data.url) {
           if (activeUploadCallback) {
@@ -208,7 +204,7 @@ function setupAdminListeners() {
           alert('Error al subir imagen: ' + (data.error || 'Intenta de nuevo'));
         }
       } catch (err) {
-        alert('Error de conexión subiendo imagen: ' + err.message);
+        alert('Error de conexión subiendo imagen a Vercel.');
       } finally {
         globalFileInput.value = '';
         activeUploadCallback = null;
@@ -229,16 +225,13 @@ async function loadAdminData() {
     const resApi = await fetch(apiUrl);
     
     if (resApi.ok) {
-      const contentType = resApi.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        const dataApi = await resApi.json();
-        if (dataApi.config && dataApi.menu) {
-          adminConfig = dataApi.config;
-          adminMenu = dataApi.menu;
-          availableAssets = dataApi.availableAssets || [];
-          populateAllFields();
-          return;
-        }
+      const dataApi = await resApi.json();
+      if (dataApi.config && dataApi.menu) {
+        adminConfig = dataApi.config;
+        adminMenu = dataApi.menu;
+        availableAssets = dataApi.availableAssets || [];
+        populateAllFields();
+        return;
       }
     }
 
@@ -510,22 +503,17 @@ async function saveAllToVercelStorage() {
       })
     });
 
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      throw new Error('Respuesta no válida del servidor. Verifica la URL de Vercel.');
-    }
-
     const result = await response.json();
 
     if (response.ok && result.success) {
       localStorage.removeItem('gb_config_draft');
       localStorage.removeItem('gb_menu_draft');
-      alert('¡Excelente! Los cambios se han guardado exitosamente en Vivo.');
+      alert('¡Excelente! Los cambios se han guardado exitosamente.');
     } else {
       alert('Error guardando: ' + (result.error || 'Intenta de nuevo.'));
     }
   } catch (err) {
-    alert('Error de conexión: ' + err.message);
+    alert('Error de conexión con Vercel. Si estás en GitHub Pages, asegúrate de ingresar la URL pública de tu despliegue en Vercel.');
   } finally {
     saveAllVercelBtn.disabled = false;
     saveAllVercelBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Guardar Cambios en Vivo`;
