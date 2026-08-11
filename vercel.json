@@ -2,6 +2,7 @@
   "version": 2,
   "builds": [
     { "src": "api/*.js", "use": "@vercel/node" },
+    { "src": "assets/**/*", "use": "@vercel/static" },
     { "src": "*", "use": "@vercel/static" }
   ],
   "routes": [
@@ -13,6 +14,10 @@
         "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, Authorization"
       },
       "dest": "/api/$1.js"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
     }
   ]
 }
