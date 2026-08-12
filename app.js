@@ -58,7 +58,7 @@ async function loadStoreData() {
       if (contentType && contentType.includes('application/json')) {
         const dataApi = await resApi.json();
         if (dataApi.config && dataApi.menu) {
-          STORE_CONFIG = dataApi.config;
+          STORE_CONFIG = typeof dataApi.config === 'string' ? JSON.parse(dataApi.config) : dataApi.config;
           MENU_ITEMS = dataApi.menu;
           localStorage.setItem('gb_live_config', JSON.stringify(STORE_CONFIG));
           localStorage.setItem('gb_live_menu', JSON.stringify(MENU_ITEMS));

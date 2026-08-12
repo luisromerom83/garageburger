@@ -239,7 +239,7 @@ async function loadAdminData() {
     if (resApi.ok) {
       const dataApi = await resApi.json();
       if (dataApi.config && dataApi.menu) {
-        adminConfig = dataApi.config;
+        adminConfig = typeof dataApi.config === 'string' ? JSON.parse(dataApi.config) : dataApi.config;
         adminMenu = dataApi.menu;
         availableAssets = dataApi.availableAssets || [];
         localStorage.setItem('gb_live_config', JSON.stringify(adminConfig));
