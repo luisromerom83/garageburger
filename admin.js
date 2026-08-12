@@ -233,8 +233,8 @@ function triggerFileUpload(onSuccessCallback) {
 
 async function loadAdminData() {
   try {
-    const apiUrl = getApiEndpoint('/api/store');
-    const resApi = await fetch(apiUrl);
+    const apiUrl = getApiEndpoint(`/api/store?t=${Date.now()}`);
+    const resApi = await fetch(apiUrl, { cache: 'no-store' });
     
     if (resApi.ok) {
       const dataApi = await resApi.json();

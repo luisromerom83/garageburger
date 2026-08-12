@@ -50,8 +50,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Load Config & Menu from Vercel API, JSON or LocalStorage Draft Override
 async function loadStoreData() {
   try {
-    const apiUrl = getApiEndpoint('/api/store');
-    const resApi = await fetch(apiUrl);
+    const apiUrl = getApiEndpoint(`/api/store?t=${Date.now()}`);
+    const resApi = await fetch(apiUrl, { cache: 'no-store' });
     
     if (resApi.ok) {
       const contentType = resApi.headers.get('content-type');
