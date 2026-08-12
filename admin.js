@@ -119,6 +119,15 @@ function setupAdminListeners() {
     });
   });
 
+  // Automatic Schedule Text Generator
+  document.querySelectorAll('.day-chk').forEach(chk => {
+    chk.addEventListener('change', autoGenerateScheduleText);
+  });
+  const openHrSelect = document.getElementById('cfg-open-hour');
+  const closeHrSelect = document.getElementById('cfg-close-hour');
+  if (openHrSelect) openHrSelect.addEventListener('change', autoGenerateScheduleText);
+  if (closeHrSelect) closeHrSelect.addEventListener('change', autoGenerateScheduleText);
+
   addFeatureTagBtn.addEventListener('click', () => {
     if (!adminConfig || typeof adminConfig !== 'object') adminConfig = {};
     if (!adminConfig.hero || typeof adminConfig.hero !== 'object') adminConfig.hero = {};
@@ -224,6 +233,45 @@ function setupAdminListeners() {
     };
     reader.readAsDataURL(file);
   });
+}
+
+function formatHourText(h) {
+  if (h === 0) return '12:00 AM (Medianoche)';
+  if (h < 12) return `${h}:00 AM`;
+  if (h === 12) return '12:00 PM';
+  return `${h - 12}:00 PM`;
+}
+
+function autoGenerateScheduleText() {
+  const dayNames = { 1: 'Lunes', 2: 'Martes', 3: 'Miércoles', 4: 'Jueves', 5: 'Viernes', 6: 'Sábado', 0: 'Domingo' };
+  const checkedVals = Array.from(document.querySelectorAll('.day-chk:checked')).map(c => parseInt(c.value, 10));
+
+  if (checkedVals.length === 0) return;
+
+  // Sort according to week order: 1 (Mon) -> 6 (Sat) -> 0 (Sun)
+  const orderedDays = [1, 2, 3, 4, 5, 6, 0].filter(d => checkedVals.includes(d));
+
+  let daysText = '';
+  if (orderedDays.length === 7) {
+    daysText = 'Todos los días';
+  } else if (orderedDays.length === 4 && orderedDays.includes(4) && orderedDays.includes(5) && orderedDays.includes(6) && orderedDays.includes(0)) {
+    daysText = 'Jueves a Domingo';
+  } else if (orderedDays.length === 3 && orderedDays.includes(5) && orderedDays.includes(6) && orderedDays.includes(0)) {
+    daysText = 'Viernes a Domingo';
+  } else {
+    daysText = orderedDays.map(d => dayNames[d]).join(', ');
+  }
+
+  const openHr = parseInt(document.getElementById('cfg-open-hour').value, 10);
+  const closeHr = parseInt(document.getElementById('cfg-close-hour').value, 10);
+
+  const openStr = formatHourText(openHr);
+  const closeStr = formatHourText(closeHr);
+
+  const fullSchedule = `${daysText}: ${openStr} - ${closeStr}`;
+  if (cfgSchedule) {
+    cfgSchedule.value = fullSchedule;
+  }
 }
 
 function triggerFileUpload(onSuccessCallback) {
