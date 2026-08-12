@@ -339,6 +339,9 @@ function populateAllFields() {
   const openHrSelect = document.getElementById('cfg-open-hour');
   const closeHrSelect = document.getElementById('cfg-close-hour');
   if (openHrSelect) openHrSelect.value = adminConfig.openHour !== undefined ? adminConfig.openHour : 19;
+  if (closeHrSelect) closeHrSelect.value = adminConfig.closeHour !== undefined ? adminConfig.closeHour : 23;
+
+  autoGenerateScheduleText();
   const phone1El = document.getElementById('cfg-wa');
   const phone2El = document.getElementById('cfg-phone2');
   const igEl = document.getElementById('cfg-ig');
