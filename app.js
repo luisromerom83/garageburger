@@ -185,10 +185,10 @@ function checkOperatingStatus() {
 
   if (isOperatingDay && isOperatingHour) {
     statusBadge.className = 'badge-status open';
-    statusText.textContent = 'ABIERTO AHORA';
+    statusText.textContent = 'ABIERTO';
   } else {
     statusBadge.className = 'badge-status closed';
-    statusText.textContent = `CERRADO (${STORE_CONFIG.scheduleText || 'Horario en sitio'})`;
+    statusText.textContent = 'CERRADO';
   }
 }
 

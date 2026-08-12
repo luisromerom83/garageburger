@@ -415,17 +415,17 @@ img {
 
 .hero-img-card {
   position: relative;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
-  border: 1px solid var(--border-color);
-  background: #0d0f12;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .hero-img-card img {
   width: 100%;
   height: auto;
-  max-height: 520px;
+  max-height: 480px;
   object-fit: contain;
   display: block;
 }
