@@ -120,13 +120,16 @@ function setupAdminListeners() {
   });
 
   addFeatureTagBtn.addEventListener('click', () => {
-    if (!adminConfig.hero.features) adminConfig.hero.features = [];
+    if (!adminConfig || typeof adminConfig !== 'object') adminConfig = {};
+    if (!adminConfig.hero || typeof adminConfig.hero !== 'object') adminConfig.hero = {};
+    if (!Array.isArray(adminConfig.hero.features)) adminConfig.hero.features = [];
     adminConfig.hero.features.push({ icon: 'fa-star', text: 'Nueva Etiqueta' });
     renderHeroFeatures();
   });
 
   addAnnouncementBtn.addEventListener('click', () => {
-    if (!adminConfig.announcements) adminConfig.announcements = [];
+    if (!adminConfig || typeof adminConfig !== 'object') adminConfig = {};
+    if (!Array.isArray(adminConfig.announcements)) adminConfig.announcements = [];
     adminConfig.announcements.push({
       id: `ann-${Date.now()}`,
       title: 'NUEVO ANUNCIO',
@@ -137,7 +140,8 @@ function setupAdminListeners() {
   });
 
   addCategoryBtn.addEventListener('click', () => {
-    if (!adminConfig.categories) adminConfig.categories = [];
+    if (!adminConfig || typeof adminConfig !== 'object') adminConfig = {};
+    if (!Array.isArray(adminConfig.categories)) adminConfig.categories = [];
     const catName = prompt('Nombre de la nueva categoría (Ej: Postres):');
     if (catName) {
       const catId = catName.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -268,12 +272,15 @@ async function loadAdminData() {
 }
 
 function populateAllFields() {
-  const hero = adminConfig.hero || {};
-  heroTitleInput.value = hero.title || '';
-  heroImageInput.value = hero.image || '';
-  heroDescInput.value = hero.description || '';
-  heroBadgeLabelInput.value = hero.badgeLabel || '';
-  heroBadgeHighlightInput.value = hero.badgeHighlight || '';
+  if (!adminConfig || typeof adminConfig !== 'object') adminConfig = {};
+  if (!adminConfig.hero || typeof adminConfig.hero !== 'object') adminConfig.hero = {};
+  
+  const hero = adminConfig.hero;
+  if (heroTitleInput) heroTitleInput.value = hero.title || '';
+  if (heroImageInput) heroImageInput.value = hero.image || '';
+  if (heroDescInput) heroDescInput.value = hero.description || '';
+  if (heroBadgeLabelInput) heroBadgeLabelInput.value = hero.badgeLabel || '';
+  if (heroBadgeHighlightInput) heroBadgeHighlightInput.value = hero.badgeHighlight || '';
   if (cfgSchedule) cfgSchedule.value = adminConfig.scheduleText || 'Jueves a Domingo: 7:00 PM - 11:00 PM';
   
   const activeDays = adminConfig.activeDays || [0, 4, 5, 6];
