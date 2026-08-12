@@ -371,10 +371,14 @@ function renderHeroFeatures() {
 }
 
 window.updateFeatureTag = function(index, key, val) {
-  adminConfig.hero.features[index][key] = val;
+  if (!adminConfig.hero) adminConfig.hero = {};
+  if (!Array.isArray(adminConfig.hero.features)) adminConfig.hero.features = [];
+  if (adminConfig.hero.features[index]) adminConfig.hero.features[index][key] = val;
 };
 
 window.deleteFeatureTag = function(index) {
+  if (!adminConfig.hero) adminConfig.hero = {};
+  if (!Array.isArray(adminConfig.hero.features)) adminConfig.hero.features = [];
   adminConfig.hero.features.splice(index, 1);
   renderHeroFeatures();
 };
@@ -415,10 +419,12 @@ window.openPickerForAnnouncement = function(index) {
 };
 
 window.updateAnnouncement = function(index, key, val) {
-  adminConfig.announcements[index][key] = val;
+  if (!Array.isArray(adminConfig.announcements)) adminConfig.announcements = [];
+  if (adminConfig.announcements[index]) adminConfig.announcements[index][key] = val;
 };
 
 window.deleteAnnouncement = function(index) {
+  if (!Array.isArray(adminConfig.announcements)) adminConfig.announcements = [];
   adminConfig.announcements.splice(index, 1);
   renderAnnouncementsEditor();
 };
@@ -435,11 +441,13 @@ function renderCategoriesEditor() {
 }
 
 window.updateCategory = function(index, key, val) {
-  adminConfig.categories[index][key] = val;
+  if (!Array.isArray(adminConfig.categories)) adminConfig.categories = [];
+  if (adminConfig.categories[index]) adminConfig.categories[index][key] = val;
   renderAdminTable();
 };
 
 window.deleteCategory = function(index) {
+  if (!Array.isArray(adminConfig.categories)) adminConfig.categories = [];
   adminConfig.categories.splice(index, 1);
   renderCategoriesEditor();
   renderAdminTable();

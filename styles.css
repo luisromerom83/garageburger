@@ -515,7 +515,7 @@ img {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
-  padding: 40px;
+  padding: 40px 75px;
   gap: 30px;
 }
 
@@ -1145,8 +1145,13 @@ img {
 
 /* Responsive Media Queries */
 @media (max-width: 900px) {
-  .hero-content, .carousel-slide {
+  .hero-content {
     grid-template-columns: 1fr;
+  }
+
+  .carousel-slide {
+    grid-template-columns: 1fr;
+    padding: 35px 65px;
   }
 
   .hero-title {
