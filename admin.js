@@ -23,7 +23,7 @@ const POPULAR_ICONS = [
 
 function getApiEndpoint(route) {
   if (window.location.hostname.includes('github.io')) {
-    const vercelDomain = localStorage.getItem('gb_custom_vercel_domain') || 'https://garageburger.vercel.app';
+    const vercelDomain = localStorage.getItem('gb_custom_vercel_domain') || 'https://garageburger-jet.vercel.app';
     return `${vercelDomain}${route}`;
   }
   return route;

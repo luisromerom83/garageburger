@@ -9,7 +9,7 @@ let carouselInterval = null;
 // Helper: Smart Vercel API Base Resolver
 function getApiEndpoint(route) {
   if (window.location.hostname.includes('github.io')) {
-    return `https://garageburger.vercel.app${route}`;
+    return `https://garageburger-jet.vercel.app${route}`;
   }
   return route;
 }
