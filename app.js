@@ -183,12 +183,14 @@ function checkOperatingStatus() {
     isOperatingHour = hour >= openHour || hour < closeHour;
   }
 
+  const scheduleStr = STORE_CONFIG.scheduleText ? ` (${STORE_CONFIG.scheduleText})` : '';
+
   if (isOperatingDay && isOperatingHour) {
     statusBadge.className = 'badge-status open';
-    statusText.textContent = 'ABIERTO';
+    statusText.textContent = `ABIERTO${scheduleStr}`;
   } else {
     statusBadge.className = 'badge-status closed';
-    statusText.textContent = 'CERRADO';
+    statusText.textContent = `CERRADO${scheduleStr}`;
   }
 }
 
