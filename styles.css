@@ -1053,28 +1053,42 @@ img {
 
 .cart-item {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--bg-card);
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  transition: var(--transition-fast);
+}
+
+.cart-item:hover {
+  border-color: rgba(255, 94, 0, 0.35);
+}
+
+.cart-item-main {
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--bg-card);
-  padding: 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
+  gap: 10px;
 }
 
 .cart-item-info h4 {
   font-size: 0.95rem;
   color: #fff;
+  margin-bottom: 2px;
 }
 
 .cart-item-info p {
   font-size: 0.85rem;
   color: var(--primary-yellow);
+  font-weight: 600;
 }
 
 .cart-item-controls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .qty-btn {
@@ -1087,16 +1101,60 @@ img {
   align-items: center;
   justify-content: center;
   font-weight: 700;
+  border: 1px solid var(--border-color);
+  transition: var(--transition-fast);
 }
 
 .qty-btn:hover {
   background: var(--primary-orange);
+  border-color: var(--primary-orange);
+  color: #fff;
 }
 
 .qty-val {
   font-weight: 700;
   min-width: 16px;
   text-align: center;
+}
+
+.cart-item-note-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.cart-item-note-row .cart-note-icon {
+  position: absolute;
+  left: 10px;
+  font-size: 0.8rem;
+  color: var(--primary-yellow);
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.cart-item-note-input {
+  width: 100%;
+  background: rgba(13, 15, 18, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f0f2f5;
+  border-radius: var(--radius-sm);
+  padding: 7px 10px 7px 30px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.cart-item-note-input::placeholder {
+  color: rgba(150, 160, 175, 0.6);
+  font-style: italic;
+}
+
+.cart-item-note-input:focus {
+  border-color: var(--primary-orange);
+  background: rgba(20, 24, 30, 0.95);
+  box-shadow: 0 0 8px rgba(255, 94, 0, 0.25);
 }
 
 .drawer-footer {

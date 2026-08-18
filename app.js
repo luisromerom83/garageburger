@@ -398,6 +398,16 @@ function filterMenu(category, query) {
   renderMenu(filtered);
 }
 
+function escapeHtmlAttr(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 function addToCart(itemId) {
   const item = MENU_ITEMS.find(i => i.id === itemId);
   if (!item || item.available === false) return;
@@ -407,7 +417,7 @@ function addToCart(itemId) {
   if (existingIndex > -1) {
     cart[existingIndex].qty += 1;
   } else {
-    cart.push({ ...item, qty: 1 });
+    cart.push({ ...item, qty: 1, note: '' });
   }
 
   updateCartUI();
@@ -423,6 +433,12 @@ window.updateCartQty = function(itemId, delta) {
   if (cart[index].qty <= 0) cart.splice(index, 1);
 
   updateCartUI();
+};
+
+window.updateCartItemNote = function(index, note) {
+  if (cart[index]) {
+    cart[index].note = note;
+  }
 };
 
 function updateCartUI() {
@@ -444,16 +460,28 @@ function updateCartUI() {
     return;
   }
 
-  cartItemsContainer.innerHTML = cart.map(item => `
+  cartItemsContainer.innerHTML = cart.map((item, index) => `
     <div class="cart-item">
-      <div class="cart-item-info">
-        <h4>${item.name}</h4>
-        <p>$${item.price} MXN c/u</p>
+      <div class="cart-item-main">
+        <div class="cart-item-info">
+          <h4>${item.name}</h4>
+          <p>$${item.price} MXN c/u</p>
+        </div>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="updateCartQty('${item.id}', -1)" title="Menos">-</button>
+          <span class="qty-val">${item.qty}</span>
+          <button class="qty-btn" onclick="updateCartQty('${item.id}', 1)" title="Más">+</button>
+        </div>
       </div>
-      <div class="cart-item-controls">
-        <button class="qty-btn" onclick="updateCartQty('${item.id}', -1)">-</button>
-        <span class="qty-val">${item.qty}</span>
-        <button class="qty-btn" onclick="updateCartQty('${item.id}', 1)">+</button>
+      <div class="cart-item-note-row">
+        <i class="fa-solid fa-pen-to-square cart-note-icon"></i>
+        <input 
+          type="text" 
+          class="cart-item-note-input" 
+          placeholder="Nota para este producto (ej. sin cebolla, salsa aparte...)" 
+          value="${escapeHtmlAttr(item.note || '')}" 
+          oninput="updateCartItemNote(${index}, this.value)"
+        />
       </div>
     </div>
   `).join('');
@@ -473,20 +501,23 @@ function sendWhatsAppOrder() {
     return;
   }
 
-  const notes = document.getElementById('order-notes').value.trim();
+  const generalNotes = document.getElementById('order-notes').value.trim();
   const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
   let message = `🍔 *NUEVO PEDIDO - GARAGE BURGER* 🍺\n\n`;
   message += `*Detalle del pedido:*\n`;
 
   cart.forEach(item => {
-    message += `• ${item.qty}x ${item.name} - $${item.price * item.qty} MXN\n`;
+    message += `• *${item.qty}x ${item.name}* - $${item.price * item.qty} MXN\n`;
+    if (item.note && item.note.trim()) {
+      message += `   ↳ _Nota: ${item.note.trim()}_\n`;
+    }
   });
 
   message += `\n*Total Estimado:* $${total} MXN\n`;
 
-  if (notes) {
-    message += `*Notas / Salsas:* ${notes}\n`;
+  if (generalNotes) {
+    message += `\n*Notas Generales:* ${generalNotes}\n`;
   }
 
   message += `\n¡Hola! Quisiera realizar este pedido. Por favor me confirman el tiempo estimado y lugar de entrega/recogida.`;
